@@ -114,9 +114,9 @@ def confirm_payment():
                 'service_time': booking_data.get('service_time'),
                 'service_location': booking_data.get('service_location'),
                 'address': booking_data.get('address'),
-                'total_amount': booking_data.get('total_amount'),
+                'total_amount': float(intent.metadata.get('total_amount', 0)),
                 'deposit_paid': intent.amount / 100,  # Convert from pence to pounds
-                'remaining_balance': booking_data.get('total_amount') - (intent.amount / 100),
+                'remaining_balance': float(intent.metadata.get('total_amount', 0)) - (intent.amount / 100),
                 'payment_status': 'deposit_paid',
                 'booking_status': 'confirmed',
                 'created_at': datetime.now().isoformat(),
