@@ -19,6 +19,7 @@ et_xmlfile==2.0.0
 fastapi==0.115.14
 Flask==3.1.1
 Flask-Cors==4.0.1
+Flask-SQLAlchemy==3.1.1
 fonttools==4.58.4
 fpdf==1.7.2
 fpdf2==2.8.3
