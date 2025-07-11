@@ -30,7 +30,8 @@ app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(payment_bp, url_prefix='/api/payment')
 
 # uncomment if you need to use database
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(os.path.dirname(__file__), 'database', 'app.db')}"
+DATABASE_PATH = os.path.join('/var/data', 'app.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DATABASE_PATH}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 with app.app_context():
