@@ -86,3 +86,6 @@ zopfli==0.2.3.post1
 gunicorn
 
 
+
+Flask-Mail==0.9.1
+

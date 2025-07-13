@@ -4,6 +4,7 @@ import stripe
 import os
 import json
 from datetime import datetime
+from services.email_service import email_service
 
 payment_bp = Blueprint('payment', __name__)
 
@@ -105,30 +106,33 @@ def confirm_payment():
             booking_record = {
                 'booking_id': booking_id,
                 'payment_intent_id': payment_intent_id,
-                'customer_name': booking_data.get('customer_name'),
-                'customer_email': booking_data.get('customer_email'),
+                'customer_name': intent.metadata.get('customer_name'),
+                'customer_email': intent.metadata.get('customer_email'),
                 'customer_phone': booking_data.get('customer_phone'),
-                'service_type': booking_data.get('service_type'),
-                'vehicle_type': booking_data.get('vehicle_type'),
-                'service_date': booking_data.get('service_date'),
-                'service_time': booking_data.get('service_time'),
+                'service_type': intent.metadata.get('service_type'),
+                'vehicle_type': intent.metadata.get('vehicle_type'),
+                'service_date': intent.metadata.get('service_date'),
+                'service_time': intent.metadata.get('service_time'),
                 'service_location': booking_data.get('service_location'),
                 'address': booking_data.get('address'),
-                'total_amount': booking_data.get('total_amount'),
+                'total_amount': float(intent.metadata.get('total_amount', 0)),
                 'deposit_paid': intent.amount / 100,  # Convert from pence to pounds
-                'remaining_balance': booking_data.get('total_amount') - (intent.amount / 100),
+                'remaining_balance': float(intent.metadata.get('total_amount', 0)) - (intent.amount / 100),
                 'payment_status': 'deposit_paid',
                 'booking_status': 'confirmed',
                 'created_at': datetime.now().isoformat(),
                 'special_requests': booking_data.get('special_requests', '')
             }
             
-            # Send confirmation email (integrate with existing booking email system)
+            # Send confirmation emails using the new email service
             try:
-                # You can integrate this with your existing email system
-                send_booking_confirmation_email(booking_record)
+                email_sent = email_service.send_booking_confirmation(booking_record)
+                if email_sent:
+                    print(f"Booking confirmation emails sent successfully for {booking_id}")
+                else:
+                    print(f"Warning: Email sending failed for booking {booking_id}")
             except Exception as email_error:
-                print(f"Email sending failed: {email_error}")
+                print(f"Email sending error: {email_error}")
             
             return jsonify({
                 'success': True,
@@ -161,12 +165,6 @@ def get_stripe_config():
         'success': True,
         'publishable_key': STRIPE_PUBLISHABLE_KEY
     }), 200
-
-def send_booking_confirmation_email(booking_data):
-    """Send booking confirmation email with payment details"""
-    # This would integrate with your existing email system
-    # For now, this is a placeholder function
-    pass
 
 @payment_bp.route('/webhook', methods=['POST'])
 @cross_origin()
