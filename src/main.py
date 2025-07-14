@@ -30,7 +30,16 @@ app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(payment_bp, url_prefix='/api/payment')
 
 # uncomment if you need to use database
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(os.path.dirname(__file__), 'database', 'app.db')}"
+# Use /var/data for production (Render), local directory for development
+if os.path.exists('/var/data'):
+    DATABASE_PATH = os.path.join('/var/data', 'app.db')
+else:
+    # Create local database directory for development
+    db_dir = os.path.join(os.path.dirname(__file__), 'database')
+    os.makedirs(db_dir, exist_ok=True)
+    DATABASE_PATH = os.path.join(db_dir, 'app.db')
+
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DATABASE_PATH}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 with app.app_context():
@@ -51,4 +60,8 @@ def serve(path):
             return send_from_directory(static_folder_path, 'index.html')
         else:
             return "index.html not found", 404
+
+if __name__ == '__main__':
+    # For local development
+    app.run(host='0.0.0.0', port=5000, debug=True)
 
