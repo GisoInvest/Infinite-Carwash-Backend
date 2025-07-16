@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_cors import cross_origin
 import uuid
 from datetime import datetime
-from services.email_service import email_service
+from src.services.email_service import email_service
 
 subscription_bp = Blueprint('subscription', __name__)
 

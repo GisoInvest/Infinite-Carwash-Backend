@@ -4,7 +4,7 @@ import stripe
 import os
 import json
 from datetime import datetime
-from services.email_service import email_service
+from src.services.email_service import email_service
 
 payment_bp = Blueprint('payment', __name__)
 
