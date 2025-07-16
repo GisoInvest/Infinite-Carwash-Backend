@@ -38,21 +38,30 @@ class EmailService:
             server = smtplib.SMTP(self.smtp_server, self.smtp_port)
             server.starttls()
             
-            # For demonstration purposes, we'll log the email instead of actually sending
-            # In production, you would uncomment the following lines and set up proper SMTP credentials
-            # server.login(self.email_address, self.email_password)
-            # text = msg.as_string()
-            # server.sendmail(self.email_address, [to_email] + ([cc_email] if cc_email else []), text)
-            # server.quit()
-            
-            # For now, log the email content for demonstration
-            logger.info(f"EMAIL SENT TO: {to_email}")
-            logger.info(f"SUBJECT: {subject}")
-            if cc_email:
-                logger.info(f"CC: {cc_email}")
-            logger.info("EMAIL CONTENT:")
-            logger.info(html_content)
-            logger.info("=" * 80)
+            # Use app password for Gmail or environment variable for other services
+            if self.email_password:
+                server.login(self.email_address, self.email_password)
+                text = msg.as_string()
+                recipients = [to_email]
+                if cc_email:
+                    recipients.append(cc_email)
+                server.sendmail(self.email_address, recipients, text)
+                server.quit()
+                
+                logger.info(f"EMAIL SUCCESSFULLY SENT TO: {to_email}")
+                if cc_email:
+                    logger.info(f"CC: {cc_email}")
+                logger.info(f"SUBJECT: {subject}")
+            else:
+                # Fallback: log email if no password configured
+                logger.warning("No email password configured - logging email instead of sending")
+                logger.info(f"EMAIL WOULD BE SENT TO: {to_email}")
+                logger.info(f"SUBJECT: {subject}")
+                if cc_email:
+                    logger.info(f"CC: {cc_email}")
+                logger.info("EMAIL CONTENT:")
+                logger.info(html_content)
+                logger.info("=" * 80)
             
             return True
             
