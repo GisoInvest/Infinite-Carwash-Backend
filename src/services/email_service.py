@@ -420,6 +420,212 @@ class EmailService:
         </html>
         """
 
+    def send_loyalty_reward_notification(self, reward_data):
+        """Send loyalty reward notification email to customer"""
+        try:
+            customer_email = reward_data.get('customer_email')
+            customer_name = reward_data.get('customer_name')
+            rewards_earned = reward_data.get('rewards_earned', [])
+            total_bookings = reward_data.get('total_bookings', 0)
+            
+            # Create subject based on rewards earned
+            if 'free_wash' in rewards_earned and '15_percent_discount' in rewards_earned:
+                subject = "🎉 Amazing! You've Earned BOTH a Free Wash AND 15% Discount!"
+            elif 'free_wash' in rewards_earned:
+                subject = "🎉 Congratulations! You've Earned a FREE Car Wash!"
+            elif '15_percent_discount' in rewards_earned:
+                subject = "🎉 Fantastic! You've Earned a 15% Discount!"
+            else:
+                subject = "🎉 Loyalty Rewards Update - Infinite Mobile Carwash"
+            
+            html_content = self._create_loyalty_reward_email(reward_data)
+            
+            # Send to customer
+            customer_sent = self.send_email(customer_email, subject, html_content)
+            
+            # Send notification to company
+            company_subject = f"Loyalty Reward Earned - {customer_name}"
+            company_html = self._create_company_loyalty_notification(reward_data)
+            company_sent = self.send_email(self.company_email, company_subject, company_html)
+            
+            return customer_sent and company_sent
+            
+        except Exception as e:
+            logger.error(f"Error sending loyalty reward notification: {str(e)}")
+            return False
+    
+    def _create_loyalty_reward_email(self, reward_data):
+        """Create HTML email for loyalty reward notification"""
+        customer_name = reward_data.get('customer_name', 'Valued Customer')
+        rewards_earned = reward_data.get('rewards_earned', [])
+        total_bookings = reward_data.get('total_bookings', 0)
+        available_rewards = reward_data.get('available_rewards', [])
+        
+        # Create rewards content
+        rewards_content = ""
+        if 'free_wash' in rewards_earned:
+            rewards_content += """
+            <div class="reward-box free-wash">
+                <h3>🆓 FREE CAR WASH EARNED!</h3>
+                <p>You've completed 5 services and earned a completely FREE car wash!</p>
+            </div>
+            """
+        
+        if '15_percent_discount' in rewards_earned:
+            rewards_content += """
+            <div class="reward-box discount">
+                <h3>💰 15% DISCOUNT EARNED!</h3>
+                <p>You've completed 10 services and earned a 15% discount on your next booking!</p>
+            </div>
+            """
+        
+        # Available rewards section
+        available_content = ""
+        if available_rewards:
+            available_content = "<h3>Your Available Rewards:</h3><ul>"
+            for reward in available_rewards:
+                available_content += f"<li>🎁 {reward.get('description', '')}</li>"
+            available_content += "</ul>"
+        
+        return f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }}
+                .container {{ max-width: 600px; margin: 0 auto; background-color: #ffffff; }}
+                .header {{ background-color: #000000; color: #FFD700; padding: 30px 20px; text-align: center; }}
+                .content {{ padding: 30px 20px; }}
+                .reward-box {{ padding: 25px; border-radius: 10px; margin: 25px 0; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }}
+                .free-wash {{ background: linear-gradient(135deg, #28a745, #20c997); color: white; }}
+                .discount {{ background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; }}
+                .celebration {{ background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #FFD700; }}
+                .cta-button {{ background-color: #FFD700; color: #000; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; margin: 20px 0; }}
+                .footer {{ background-color: #f1f1f1; padding: 20px; text-align: center; font-size: 14px; color: #666; }}
+                .progress {{ background-color: #e9ecef; border-radius: 10px; padding: 3px; margin: 15px 0; }}
+                .progress-bar {{ background-color: #FFD700; height: 20px; border-radius: 8px; text-align: center; line-height: 20px; font-weight: bold; color: #000; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🎉 LOYALTY REWARDS 🎉</h1>
+                    <h2>INFINITE MOBILE CARWASH & DETAILING</h2>
+                </div>
+                
+                <div class="content">
+                    <p>Dear {customer_name},</p>
+                    
+                    <div class="celebration">
+                        <h3 style="margin-top: 0;">🌟 Congratulations on Your Loyalty! 🌟</h3>
+                        <p>You've now completed <strong>{total_bookings} services</strong> with us, and we couldn't be more grateful for your continued trust in our premium car care services!</p>
+                    </div>
+                    
+                    {rewards_content}
+                    
+                    <div style="text-align: center;">
+                        <a href="https://infinitemobilecarwashdetailing.co.uk/booking" class="cta-button">Book Your Next Service</a>
+                    </div>
+                    
+                    {f'<div class="celebration">{available_content}</div>' if available_content else ''}
+                    
+                    <h3>How to Redeem Your Rewards:</h3>
+                    <ol>
+                        <li>Visit our website and select your preferred service</li>
+                        <li>During booking, mention your reward in the special requests</li>
+                        <li>Our team will apply your reward automatically</li>
+                        <li>Enjoy your discounted or FREE service!</li>
+                    </ol>
+                    
+                    <div class="celebration">
+                        <h4>Your Loyalty Journey:</h4>
+                        <p>🎯 <strong>Next Milestone:</strong> {15 - (total_bookings % 5)} more services until your next reward!</p>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: {min(100, (total_bookings % 5) * 20)}%;">
+                                {total_bookings % 5}/5 to next reward
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p>Thank you for being such a valued customer. Your loyalty means everything to us, and we're committed to providing you with exceptional service every time!</p>
+                    
+                    <p>Best regards,<br>
+                    <strong>The Infinite Mobile Carwash & Detailing Team</strong></p>
+                </div>
+                
+                <div class="footer">
+                    <p><strong>Contact Information</strong><br>
+                    Phone: 07403139086 | Email: infinitemobilecarwashdetailing@gmail.com<br>
+                    Serving Derby & Surrounding Areas</p>
+                    <p style="margin-top: 15px; font-size: 12px;">
+                        © 2024 Infinite Mobile Carwash & Detailing. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+    
+    def _create_company_loyalty_notification(self, reward_data):
+        """Create HTML email for company loyalty reward notification"""
+        customer_name = reward_data.get('customer_name', 'Customer')
+        customer_email = reward_data.get('customer_email', '')
+        rewards_earned = reward_data.get('rewards_earned', [])
+        total_bookings = reward_data.get('total_bookings', 0)
+        
+        rewards_text = ", ".join([
+            "Free Wash" if r == 'free_wash' else "15% Discount" 
+            for r in rewards_earned
+        ])
+        
+        return f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                .header {{ background-color: #000; color: #FFD700; padding: 20px; text-align: center; }}
+                .content {{ padding: 20px; }}
+                .customer-details {{ background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }}
+                .reward-earned {{ background-color: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 5px; margin: 15px 0; }}
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>LOYALTY REWARD EARNED</h1>
+                <h2>Customer: {customer_name}</h2>
+            </div>
+            
+            <div class="content">
+                <div class="reward-earned">
+                    <h3>🎉 Reward Milestone Reached!</h3>
+                    <p><strong>Rewards Earned:</strong> {rewards_text}</p>
+                </div>
+                
+                <div class="customer-details">
+                    <h3>Customer Information</h3>
+                    <p><strong>Name:</strong> {customer_name}</p>
+                    <p><strong>Email:</strong> {customer_email}</p>
+                    <p><strong>Total Completed Bookings:</strong> {total_bookings}</p>
+                    <p><strong>Rewards Earned:</strong> {rewards_text}</p>
+                    <p><strong>Notification Sent:</strong> {datetime.now().strftime('%B %d, %Y at %I:%M %p')}</p>
+                </div>
+                
+                <p><strong>Action Items:</strong></p>
+                <ul>
+                    <li>Customer has been notified via email</li>
+                    <li>Apply rewards when customer mentions them during booking</li>
+                    <li>Track reward redemption in customer record</li>
+                    <li>Continue providing excellent service to maintain loyalty</li>
+                </ul>
+            </div>
+        </body>
+        </html>
+        """
+
 # Create global email service instance
 email_service = EmailService()
 

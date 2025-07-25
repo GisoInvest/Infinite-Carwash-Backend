@@ -1,8 +1,6 @@
-from flask_sqlalchemy import SQLAlchemy
+from src.models.user import db
 from datetime import datetime
 import uuid
-
-db = SQLAlchemy()
 
 class Driver(db.Model):
     __tablename__ = 'drivers'

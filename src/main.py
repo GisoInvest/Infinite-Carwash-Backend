@@ -7,12 +7,15 @@ from flask import Flask
 from flask_cors import CORS
 from src.models.user import db
 from src.models.driver import Driver  # Import driver model to ensure table creation
+from src.models.booking import Booking  # Import booking model to ensure table creation
+from src.models.customer import Customer  # Import customer model to ensure table creation
 from src.routes.user import user_bp
 from src.routes.booking import booking_bp
 from src.routes.subscription import subscription_bp
 from src.routes.driver import driver_bp
 from src.routes.auth import auth_bp
 from src.routes.payment import payment_bp
+from src.routes.admin import admin_bp
 from datetime import timedelta
 
 app = Flask(__name__)
@@ -28,6 +31,7 @@ app.register_blueprint(subscription_bp, url_prefix='/api')
 app.register_blueprint(driver_bp, url_prefix='/api')
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(payment_bp, url_prefix='/api/payment')
+app.register_blueprint(admin_bp, url_prefix='/api/admin')
 
 # uncomment if you need to use database
 # Use /var/data for production (Render), local directory for development
