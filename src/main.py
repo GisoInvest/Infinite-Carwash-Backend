@@ -22,8 +22,12 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'asdf#FGSgvasgf$5$WGT'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)  # Session lasts 7 days
 
-# Enable CORS for all routes
-CORS(app, supports_credentials=True)
+# Enable CORS for all routes with explicit origins
+CORS(app, 
+     supports_credentials=True,
+     origins=['https://infinitemobilecarwashdetailing.co.uk', 'http://localhost:3000', 'http://localhost:5173'],
+     allow_headers=['Content-Type', 'Authorization'],
+     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
 
 app.register_blueprint(user_bp, url_prefix='/api')
 app.register_blueprint(booking_bp, url_prefix='/api')
