@@ -3,7 +3,7 @@ import sys
 # DON'T CHANGE THIS !!!
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from flask import Flask
+from flask import Flask, request, make_response
 from flask_cors import CORS
 from src.models.user import db
 from src.models.driver import Driver  # Import driver model to ensure table creation
@@ -22,12 +22,21 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'asdf#FGSgvasgf$5$WGT'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)  # Session lasts 7 days
 
-# Enable CORS for all routes with explicit origins
+# Enable CORS for all routes with comprehensive origins
 CORS(app, 
      supports_credentials=True,
-     origins=['https://infinitemobilecarwashdetailing.co.uk', 'http://localhost:3000', 'http://localhost:5173'],
-     allow_headers=['Content-Type', 'Authorization'],
-     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
+     origins=[
+        'https://infinitemobilecarwashdetailing.co.uk',
+        'https://www.infinitemobilecarwashdetailing.co.uk',
+        'http://localhost:3000', 
+        'http://localhost:5173', 
+        'https://qmqmwbyw.manus.space',
+        'https://infinite-carwash-website.netlify.app',
+        'https://main--infinite-carwash-website.netlify.app'
+     ],
+     allow_headers=['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+     expose_headers=['Content-Type', 'Authorization'])
 
 app.register_blueprint(user_bp, url_prefix='/api')
 app.register_blueprint(booking_bp, url_prefix='/api')
@@ -56,6 +65,23 @@ with app.app_context():
 @app.route('/')
 def health_check():
     return {"status": "Backend API is running", "message": "Infinite Mobile Carwash & Detailing API"}
+
+@app.before_request
+def handle_preflight():
+    if request.method == "OPTIONS":
+        response = make_response()
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add('Access-Control-Allow-Headers', "*")
+        response.headers.add('Access-Control-Allow-Methods', "*")
+        return response
+
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With,Accept,Origin')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    return response
 
 if __name__ == '__main__':
     # For local development

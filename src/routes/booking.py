@@ -17,18 +17,19 @@ def create_booking():
         # Generate booking ID
         booking_id = Booking.generate_booking_id()
         
-        # Extract booking details
-        vehicle_type = data.get('vehicleType')
-        service = data.get('service')
-        service_location = data.get('serviceLocation')
-        date_str = data.get('date')
-        time = data.get('time')
-        customer_name = data.get('name')
-        customer_phone = data.get('phone')
-        customer_email = data.get('email')
-        total_price = float(data.get('totalPrice', 0))
-        deposit_amount = float(data.get('depositAmount', 0))
-        special_requests = data.get('specialRequests', '')
+        # Extract booking details - handle both frontend formats
+        vehicle_type = data.get('vehicleType') or data.get('vehicle_type')
+        service = data.get('service') or data.get('serviceType')
+        service_location = data.get('serviceLocation') or data.get('service_location')
+        date_str = data.get('date') or data.get('serviceDate')
+        time = data.get('time') or data.get('serviceTime')
+        customer_name = data.get('name') or data.get('customerName')
+        customer_phone = data.get('phone') or data.get('customerPhone')
+        customer_email = data.get('email') or data.get('customerEmail')
+        total_price = float(data.get('totalPrice', 0) or data.get('totalAmount', 0))
+        deposit_amount = float(data.get('depositAmount', 0) or data.get('deposit_amount', 0))
+        special_requests = data.get('specialRequests', '') or data.get('special_requests', '')
+        address = data.get('address', '')
         
         # Parse date
         service_date = datetime.strptime(date_str, '%Y-%m-%d').date()
@@ -89,7 +90,8 @@ def create_booking():
             time,
             total_price,
             deposit_amount,
-            special_requests
+            special_requests,
+            address
         )
         
         return jsonify({
@@ -106,7 +108,7 @@ def create_booking():
             'message': 'Failed to create booking. Please try again.'
         }), 500
 
-def send_confirmation_email(email, name, booking_id, vehicle_type, service, service_location, date, time, total_price, deposit_amount, special_requests):
+def send_confirmation_email(email, name, booking_id, vehicle_type, service, service_location, date, time, total_price, deposit_amount, special_requests, address=''):
     """Send booking confirmation email to customer"""
     try:
         from src.services.email_service import email_service
@@ -121,6 +123,7 @@ def send_confirmation_email(email, name, booking_id, vehicle_type, service, serv
             'service_date': date,
             'service_time': time,
             'service_location': service_location,
+            'address': address,
             'total_amount': total_price,
             'deposit_paid': deposit_amount if deposit_amount else 0.00,
             'remaining_balance': total_price - (deposit_amount if deposit_amount else 0.00),
@@ -142,4 +145,32 @@ def send_confirmation_email(email, name, booking_id, vehicle_type, service, serv
     except Exception as e:
         print(f"Error sending booking email: {str(e)}")
         return False
+
+
+
+@booking_bp.route('/time-slots', methods=['GET'])
+@cross_origin()
+def get_time_slots():
+    """Get available time slots for booking"""
+    try:
+        # Generate time slots from 8 AM to 6 PM
+        time_slots = []
+        for hour in range(8, 19):  # 8 AM to 6 PM (18:00)
+            time_str = f"{hour:02d}:00"
+            time_slots.append({
+                'value': time_str,
+                'label': f"{hour:02d}:00"
+            })
+        
+        return jsonify({
+            'success': True,
+            'time_slots': time_slots
+        }), 200
+        
+    except Exception as e:
+        print(f"Error getting time slots: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': 'Failed to get time slots'
+        }), 500
 
