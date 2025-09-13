@@ -27,7 +27,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'asdf#FGSgvasgf$5$WGT'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)  # Session lasts 7 days
 
-# Enable CORS for all routes with comprehensive origins
+# Enable CORS for all routes - FIXED: Single CORS configuration to prevent duplicate headers
 CORS(app, 
      supports_credentials=True,
      origins=[
@@ -104,22 +104,7 @@ def subscription_health_check():
             "message": str(e)
         }), 500
 
-@app.before_request
-def handle_preflight():
-    if request.method == "OPTIONS":
-        response = make_response()
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        response.headers.add('Access-Control-Allow-Headers', "*")
-        response.headers.add('Access-Control-Allow-Methods', "*")
-        return response
-
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With,Accept,Origin')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-    response.headers.add('Access-Control-Allow-Credentials', 'true')
-    return response
+# CORS is handled by Flask-CORS above - no manual headers needed
 
 if __name__ == '__main__':
     # For local development
