@@ -32,23 +32,241 @@ def force_reinitialize_plans():
 @subscription_v2_bp.route('/subscription-plans', methods=['GET'])
 @cross_origin()
 def get_subscription_plans():
-    """Get all available subscription plans"""
+    """Get all available subscription plans with updated Home Base pricing"""
     try:
-        plans = SubscriptionPlan.query.filter_by(is_active=True).all()
+        # Return hardcoded updated pricing to ensure customers see correct Home Base rates
+        # Car Wash subscription is removed as requested
         
-        plans_data = []
-        for plan in plans:
-            plan_dict = plan.to_dict()
-            
-            # Add pricing examples for different frequencies and vehicle types
-            plan_dict['pricing_examples'] = {}
-            for vehicle_type in plan.vehicle_types:
-                plan_dict['pricing_examples'][vehicle_type] = {}
-                for frequency in plan.frequency_options:
-                    price = plan.calculate_subscription_price(frequency, vehicle_type)
-                    plan_dict['pricing_examples'][vehicle_type][frequency] = price
-            
-            plans_data.append(plan_dict)
+        plans_data = [
+            # Mini Valet Subscription - Updated Home Base pricing
+            {
+                'id': 2,
+                'plan_id': 'PLAN_MINI_VALET_HOME',
+                'name': 'Mini Valet Subscription',
+                'description': 'Comprehensive exterior and interior cleaning service',
+                'service_type': 'mini_valet',
+                'base_price': 35.0,  # Home Base Small Car price
+                'duration_minutes': 90,
+                'is_premium': False,
+                'is_active': True,
+                'features': [
+                    'Full exterior wash',
+                    'Interior vacuuming', 
+                    'Dashboard cleaning',
+                    'Window cleaning (interior & exterior)',
+                    'Wheel and tire cleaning'
+                ],
+                'vehicle_types': ['small_car', 'medium_car', 'large_car', 'van'],
+                'frequency_options': ['weekly', 'bi_weekly', 'monthly'],
+                'created_at': '2025-10-01T00:00:00.000000',
+                'pricing_examples': {
+                    'small_car': {
+                        'weekly': 47.6,
+                        'bi_weekly': 25.2,
+                        'monthly': 14.0
+                    },
+                    'medium_car': {
+                        'weekly': 68.0,
+                        'bi_weekly': 36.0,
+                        'monthly': 20.0
+                    },
+                    'large_car': {
+                        'weekly': 81.6,
+                        'bi_weekly': 43.2,
+                        'monthly': 24.0
+                    },
+                    'van': {
+                        'weekly': 102.0,
+                        'bi_weekly': 54.0,
+                        'monthly': 30.0
+                    }
+                }
+            },
+            # Full Valet Subscription - Updated Home Base pricing
+            {
+                'id': 3,
+                'plan_id': 'PLAN_FULL_VALET_HOME',
+                'name': 'Full Valet Subscription',
+                'description': 'Complete premium cleaning service inside and out',
+                'service_type': 'full_valet',
+                'base_price': 80.0,  # Home Base Small Car price
+                'duration_minutes': 120,
+                'is_premium': False,
+                'is_active': True,
+                'features': [
+                    'Complete exterior wash and wax',
+                    'Full interior deep clean',
+                    'Leather/fabric treatment',
+                    'Dashboard and trim detailing',
+                    'All windows cleaned',
+                    'Wheel and tire shine',
+                    'Air freshener'
+                ],
+                'vehicle_types': ['small_car', 'medium_car', 'large_car', 'van'],
+                'frequency_options': ['bi_weekly', 'monthly'],
+                'created_at': '2025-10-01T00:00:00.000000',
+                'pricing_examples': {
+                    'small_car': {
+                        'bi_weekly': 144.0,
+                        'monthly': 80.0
+                    },
+                    'medium_car': {
+                        'bi_weekly': 180.0,
+                        'monthly': 100.0
+                    },
+                    'large_car': {
+                        'bi_weekly': 225.0,
+                        'monthly': 125.0
+                    },
+                    'van': {
+                        'bi_weekly': 252.0,
+                        'monthly': 140.0
+                    }
+                }
+            },
+            # Premium Services with updated Home Base pricing
+            {
+                'id': 4,
+                'plan_id': 'PLAN_INTERIOR_DETAILING_HOME',
+                'name': 'Interior Detailing Subscription',
+                'description': 'Professional interior deep cleaning and protection service',
+                'service_type': 'interior_detailing',
+                'base_price': 140.0,  # Updated Home Base price
+                'duration_minutes': 180,
+                'is_premium': True,
+                'is_active': True,
+                'features': [
+                    'Deep interior cleaning',
+                    'Leather conditioning',
+                    'Fabric protection',
+                    'Steam cleaning',
+                    'Odor elimination',
+                    'UV protection treatment'
+                ],
+                'vehicle_types': ['small_car', 'medium_car', 'large_car', 'van'],
+                'frequency_options': ['monthly'],
+                'created_at': '2025-10-01T00:00:00.000000',
+                'pricing_examples': {
+                    'small_car': {'monthly': 140.0},
+                    'medium_car': {'monthly': 140.0},
+                    'large_car': {'monthly': 140.0},
+                    'van': {'monthly': 140.0}
+                }
+            },
+            {
+                'id': 5,
+                'plan_id': 'PLAN_EXTERIOR_DETAILING_HOME',
+                'name': 'Exterior Detailing Subscription',
+                'description': 'Professional exterior paint correction and protection',
+                'service_type': 'exterior_detailing',
+                'base_price': 200.0,
+                'duration_minutes': 300,
+                'is_premium': True,
+                'is_active': True,
+                'features': [
+                    'Paint correction',
+                    'Ceramic coating application',
+                    'Chrome polishing',
+                    'Headlight restoration',
+                    'Tire and wheel detailing',
+                    'Paint protection'
+                ],
+                'vehicle_types': ['small_car', 'medium_car', 'large_car', 'van'],
+                'frequency_options': ['monthly'],
+                'created_at': '2025-10-01T00:00:00.000000',
+                'pricing_examples': {
+                    'small_car': {'monthly': 200.0},
+                    'medium_car': {'monthly': 200.0},
+                    'large_car': {'monthly': 200.0},
+                    'van': {'monthly': 200.0}
+                }
+            },
+            {
+                'id': 6,
+                'plan_id': 'PLAN_FULL_DETAILING_HOME',
+                'name': 'Full Detailing Subscription',
+                'description': 'Complete professional detailing service - interior and exterior',
+                'service_type': 'full_detailing',
+                'base_price': 300.0,
+                'duration_minutes': 480,
+                'is_premium': True,
+                'is_active': True,
+                'features': [
+                    'Complete paint correction',
+                    'Ceramic coating',
+                    'Full interior detailing',
+                    'Leather restoration',
+                    'Engine bay cleaning',
+                    'Headlight restoration',
+                    'Tire and wheel detailing',
+                    'Paint and fabric protection'
+                ],
+                'vehicle_types': ['small_car', 'medium_car', 'large_car', 'van'],
+                'frequency_options': ['monthly'],
+                'created_at': '2025-10-01T00:00:00.000000',
+                'pricing_examples': {
+                    'small_car': {'monthly': 300.0},
+                    'medium_car': {'monthly': 300.0},
+                    'large_car': {'monthly': 300.0},
+                    'van': {'monthly': 300.0}
+                }
+            },
+            {
+                'id': 7,
+                'plan_id': 'PLAN_STAGE1_POLISHING_HOME',
+                'name': 'Stage 1 Polishing Subscription',
+                'description': 'Single-stage machine polishing for paint enhancement',
+                'service_type': 'stage1_polishing',
+                'base_price': 450.0,  # Updated Home Base price
+                'duration_minutes': 240,
+                'is_premium': True,
+                'is_active': True,
+                'features': [
+                    'Single-stage machine polish',
+                    'Paint enhancement',
+                    'Swirl mark removal',
+                    'Protective wax application',
+                    'Chrome and trim polishing'
+                ],
+                'vehicle_types': ['small_car', 'medium_car', 'large_car', 'van'],
+                'frequency_options': ['monthly'],
+                'created_at': '2025-10-01T00:00:00.000000',
+                'pricing_examples': {
+                    'small_car': {'monthly': 450.0},
+                    'medium_car': {'monthly': 450.0},
+                    'large_car': {'monthly': 450.0},
+                    'van': {'monthly': 450.0}
+                }
+            },
+            {
+                'id': 8,
+                'plan_id': 'PLAN_STAGE2_POLISHING_HOME',
+                'name': 'Stage 2 Polishing Subscription',
+                'description': 'Two-stage machine polishing for maximum paint correction',
+                'service_type': 'stage2_polishing',
+                'base_price': 650.0,  # Updated Home Base price
+                'duration_minutes': 360,
+                'is_premium': True,
+                'is_active': True,
+                'features': [
+                    'Two-stage machine polish',
+                    'Complete paint correction',
+                    'Scratch and swirl removal',
+                    'High-grade protective coating',
+                    'Chrome and trim restoration',
+                    'Paint depth enhancement'
+                ],
+                'vehicle_types': ['small_car', 'medium_car', 'large_car', 'van'],
+                'frequency_options': ['monthly'],
+                'created_at': '2025-10-01T00:00:00.000000',
+                'pricing_examples': {
+                    'small_car': {'monthly': 650.0},
+                    'medium_car': {'monthly': 650.0},
+                    'large_car': {'monthly': 650.0},
+                    'van': {'monthly': 650.0}
+                }
+            }
+        ]
         
         return jsonify({
             'success': True,
