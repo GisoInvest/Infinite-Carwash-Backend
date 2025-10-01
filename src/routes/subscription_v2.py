@@ -9,6 +9,26 @@ import json
 
 subscription_v2_bp = Blueprint('subscription_v2', __name__)
 
+@subscription_v2_bp.route('/force-reinitialize-plans', methods=['POST'])
+@cross_origin()
+def force_reinitialize_plans():
+    """Force reinitialize subscription plans - for production debugging"""
+    try:
+        from src.services.subscription_service import SubscriptionService
+        SubscriptionService.initialize_subscription_plans(force_reinitialize=True)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Subscription plans reinitialized successfully'
+        }), 200
+        
+    except Exception as e:
+        print(f"Error reinitializing plans: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Failed to reinitialize subscription plans'
+        }), 500
+
 @subscription_v2_bp.route('/subscription-plans', methods=['GET'])
 @cross_origin()
 def get_subscription_plans():

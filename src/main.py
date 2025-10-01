@@ -67,8 +67,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 with app.app_context():
     db.create_all()
-    # Initialize subscription plans on startup
-    SubscriptionService.initialize_subscription_plans()
+    # Force reinitialize subscription plans on startup to ensure latest pricing
+    SubscriptionService.initialize_subscription_plans(force_reinitialize=True)
     # Start notification scheduler
     notification_scheduler.start()
 

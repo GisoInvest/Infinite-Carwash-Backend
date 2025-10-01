@@ -7,8 +7,18 @@ import json
 class SubscriptionService:
     
     @staticmethod
-    def initialize_subscription_plans():
+    def initialize_subscription_plans(force_reinitialize=False):
         """Initialize default subscription plans"""
+        
+        # If force reinitialize, clear existing plans
+        if force_reinitialize:
+            try:
+                SubscriptionPlan.query.delete()
+                db.session.commit()
+                print("Cleared existing subscription plans for reinitialization")
+            except Exception as e:
+                print(f"Error clearing existing plans: {e}")
+                db.session.rollback()
         
         # Basic Services - Updated with new Home Base pricing
         basic_plans = [
