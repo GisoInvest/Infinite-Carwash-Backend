@@ -629,3 +629,442 @@ class EmailService:
 # Create global email service instance
 email_service = EmailService()
 
+
+    def send_subscription_confirmation_customer(self, subscription_data):
+        """Send subscription confirmation email to customer"""
+        try:
+            customer_info = subscription_data.get('customer_info', {})
+            customer_email = customer_info.get('email')
+            customer_name = customer_info.get('name')
+            
+            if not customer_email:
+                logger.error("Customer email not provided for subscription confirmation")
+                return False
+            
+            # Get subscription details
+            plan_name = subscription_data.get('plan_name', 'Car Care Subscription')
+            vehicle_type = subscription_data.get('vehicle_type', '').replace('_', ' ').title()
+            frequency = subscription_data.get('frequency', '').replace('_', ' ').title()
+            amount = subscription_data.get('amount', 0)
+            start_date = subscription_data.get('start_date', datetime.now().strftime('%Y-%m-%d'))
+            
+            subject = f"🎉 Welcome to Infinite Mobile Carwash & Detailing - Subscription Confirmed!"
+            html_content = self._create_subscription_confirmation_email(subscription_data)
+            
+            # Send to customer
+            customer_sent = self.send_email(customer_email, subject, html_content)
+            
+            if customer_sent:
+                logger.info(f"Subscription confirmation sent to customer: {customer_email}")
+            else:
+                logger.error(f"Failed to send subscription confirmation to customer: {customer_email}")
+            
+            return customer_sent
+            
+        except Exception as e:
+            logger.error(f"Error sending subscription confirmation to customer: {str(e)}")
+            return False
+    
+    def send_subscription_notification_business(self, subscription_data):
+        """Send new subscription notification to business"""
+        try:
+            customer_info = subscription_data.get('customer_info', {})
+            customer_name = customer_info.get('name')
+            customer_email = customer_info.get('email')
+            
+            subject = f"🔔 New Subscription Created - {customer_name}"
+            html_content = self._create_subscription_business_notification(subscription_data)
+            
+            # Send to business
+            business_sent = self.send_email(self.company_email, subject, html_content)
+            
+            if business_sent:
+                logger.info(f"Subscription notification sent to business for customer: {customer_name}")
+            else:
+                logger.error(f"Failed to send subscription notification to business for customer: {customer_name}")
+            
+            return business_sent
+            
+        except Exception as e:
+            logger.error(f"Error sending subscription notification to business: {str(e)}")
+            return False
+    
+    def _create_subscription_confirmation_email(self, subscription_data):
+        """Create HTML email for subscription confirmation to customer"""
+        customer_info = subscription_data.get('customer_info', {})
+        customer_name = customer_info.get('name', 'Valued Customer')
+        plan_name = subscription_data.get('plan_name', 'Car Care Subscription')
+        vehicle_type = subscription_data.get('vehicle_type', '').replace('_', ' ').title()
+        frequency = subscription_data.get('frequency', '').replace('_', ' ').title()
+        amount = subscription_data.get('amount', 0)
+        start_date = subscription_data.get('start_date', datetime.now().strftime('%Y-%m-%d'))
+        
+        return f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Subscription Confirmation</title>
+            <style>
+                body {{
+                    font-family: 'Arial', sans-serif;
+                    line-height: 1.6;
+                    color: #333;
+                    max-width: 600px;
+                    margin: 0 auto;
+                    padding: 20px;
+                    background-color: #f8f9fa;
+                }}
+                .container {{
+                    background: white;
+                    border-radius: 15px;
+                    padding: 30px;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                }}
+                .header {{
+                    text-align: center;
+                    background: linear-gradient(135deg, #1a237e, #4a148c);
+                    color: white;
+                    padding: 30px;
+                    border-radius: 15px;
+                    margin-bottom: 30px;
+                }}
+                .header h1 {{
+                    margin: 0;
+                    font-size: 28px;
+                }}
+                .success-icon {{
+                    font-size: 48px;
+                    margin-bottom: 15px;
+                }}
+                .details-section {{
+                    background: #f8f9fa;
+                    padding: 25px;
+                    border-radius: 10px;
+                    margin: 20px 0;
+                    border-left: 5px solid #FFD700;
+                }}
+                .details-section h3 {{
+                    color: #1a237e;
+                    margin-top: 0;
+                    font-size: 18px;
+                }}
+                .detail-row {{
+                    display: flex;
+                    justify-content: space-between;
+                    margin: 10px 0;
+                    padding: 8px 0;
+                    border-bottom: 1px solid #e9ecef;
+                }}
+                .detail-label {{
+                    font-weight: bold;
+                    color: #495057;
+                }}
+                .detail-value {{
+                    color: #1a237e;
+                    font-weight: 600;
+                }}
+                .next-steps {{
+                    background: linear-gradient(135deg, #e8f5e8, #f0f8f0);
+                    padding: 25px;
+                    border-radius: 10px;
+                    margin: 20px 0;
+                    border: 2px solid #28a745;
+                }}
+                .next-steps h3 {{
+                    color: #155724;
+                    margin-top: 0;
+                }}
+                .next-steps ul {{
+                    margin: 0;
+                    padding-left: 20px;
+                }}
+                .next-steps li {{
+                    margin: 8px 0;
+                    color: #155724;
+                }}
+                .contact-info {{
+                    background: #fff3cd;
+                    padding: 20px;
+                    border-radius: 10px;
+                    border: 2px solid #ffc107;
+                    text-align: center;
+                    margin: 20px 0;
+                }}
+                .contact-info h3 {{
+                    color: #856404;
+                    margin-top: 0;
+                }}
+                .footer {{
+                    text-align: center;
+                    margin-top: 30px;
+                    padding-top: 20px;
+                    border-top: 2px solid #e9ecef;
+                    color: #6c757d;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <div class="success-icon">🎉</div>
+                    <h1>Subscription Confirmed!</h1>
+                    <p>Welcome to Infinite Mobile Carwash & Detailing</p>
+                </div>
+                
+                <p>Dear {customer_name},</p>
+                
+                <p>Thank you for choosing Infinite Mobile Carwash & Detailing! Your subscription has been successfully created and we're excited to provide you with premium car care services.</p>
+                
+                <div class="details-section">
+                    <h3>📋 Subscription Details</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Service Plan:</span>
+                        <span class="detail-value">{plan_name}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Vehicle Type:</span>
+                        <span class="detail-value">{vehicle_type}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Service Frequency:</span>
+                        <span class="detail-value">{frequency}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Monthly Amount:</span>
+                        <span class="detail-value">£{amount:.2f}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Service Start Date:</span>
+                        <span class="detail-value">{start_date}</span>
+                    </div>
+                </div>
+                
+                <div class="next-steps">
+                    <h3>🚀 What Happens Next?</h3>
+                    <ul>
+                        <li>✅ We will contact you within 24 hours to schedule your first service</li>
+                        <li>✅ Our team will arrive at your location with all necessary equipment</li>
+                        <li>✅ You'll receive service reminders based on your preferences</li>
+                        <li>✅ Your subscription will automatically renew each month</li>
+                        <li>✅ You can manage your subscription anytime through our customer portal</li>
+                    </ul>
+                </div>
+                
+                <div class="contact-info">
+                    <h3>📞 Need Help?</h3>
+                    <p><strong>Phone:</strong> 07403139086</p>
+                    <p><strong>Email:</strong> info@infinitemobilecarwashdetailing.co.uk</p>
+                    <p><strong>Website:</strong> www.infinitemobilecarwashdetailing.co.uk</p>
+                </div>
+                
+                <div class="footer">
+                    <p>Thank you for choosing Infinite Mobile Carwash & Detailing!</p>
+                    <p><small>This is an automated confirmation email. Please do not reply to this email.</small></p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+    
+    def _create_subscription_business_notification(self, subscription_data):
+        """Create HTML email for business subscription notification"""
+        customer_info = subscription_data.get('customer_info', {})
+        customer_name = customer_info.get('name', 'Unknown')
+        customer_email = customer_info.get('email', 'Unknown')
+        customer_phone = customer_info.get('phone', 'Not provided')
+        customer_address = customer_info.get('address', {})
+        
+        plan_name = subscription_data.get('plan_name', 'Car Care Subscription')
+        vehicle_type = subscription_data.get('vehicle_type', '').replace('_', ' ').title()
+        frequency = subscription_data.get('frequency', '').replace('_', ' ').title()
+        amount = subscription_data.get('amount', 0)
+        start_date = subscription_data.get('start_date', datetime.now().strftime('%Y-%m-%d'))
+        stripe_customer_id = subscription_data.get('stripe_customer_id', 'N/A')
+        stripe_subscription_id = subscription_data.get('stripe_subscription_id', 'N/A')
+        
+        return f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>New Subscription Notification</title>
+            <style>
+                body {{
+                    font-family: 'Arial', sans-serif;
+                    line-height: 1.6;
+                    color: #333;
+                    max-width: 700px;
+                    margin: 0 auto;
+                    padding: 20px;
+                    background-color: #f8f9fa;
+                }}
+                .container {{
+                    background: white;
+                    border-radius: 15px;
+                    padding: 30px;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                }}
+                .header {{
+                    text-align: center;
+                    background: linear-gradient(135deg, #dc3545, #c82333);
+                    color: white;
+                    padding: 25px;
+                    border-radius: 15px;
+                    margin-bottom: 30px;
+                }}
+                .header h1 {{
+                    margin: 0;
+                    font-size: 24px;
+                }}
+                .notification-icon {{
+                    font-size: 36px;
+                    margin-bottom: 10px;
+                }}
+                .info-section {{
+                    background: #f8f9fa;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    border-left: 5px solid #007bff;
+                }}
+                .info-section h3 {{
+                    color: #007bff;
+                    margin-top: 0;
+                    font-size: 16px;
+                }}
+                .detail-row {{
+                    display: flex;
+                    justify-content: space-between;
+                    margin: 8px 0;
+                    padding: 5px 0;
+                    border-bottom: 1px solid #e9ecef;
+                }}
+                .detail-label {{
+                    font-weight: bold;
+                    color: #495057;
+                    flex: 1;
+                }}
+                .detail-value {{
+                    color: #007bff;
+                    font-weight: 600;
+                    flex: 2;
+                    text-align: right;
+                }}
+                .action-required {{
+                    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+                    padding: 20px;
+                    border-radius: 10px;
+                    border: 2px solid #ffc107;
+                    margin: 20px 0;
+                }}
+                .action-required h3 {{
+                    color: #856404;
+                    margin-top: 0;
+                }}
+                .action-required ul {{
+                    margin: 0;
+                    padding-left: 20px;
+                }}
+                .action-required li {{
+                    margin: 5px 0;
+                    color: #856404;
+                }}
+                .footer {{
+                    text-align: center;
+                    margin-top: 30px;
+                    padding-top: 20px;
+                    border-top: 2px solid #e9ecef;
+                    color: #6c757d;
+                    font-size: 14px;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <div class="notification-icon">🔔</div>
+                    <h1>New Subscription Created</h1>
+                    <p>Customer: {customer_name}</p>
+                </div>
+                
+                <div class="info-section">
+                    <h3>👤 Customer Information</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Name:</span>
+                        <span class="detail-value">{customer_name}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Email:</span>
+                        <span class="detail-value">{customer_email}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Phone:</span>
+                        <span class="detail-value">{customer_phone}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Address:</span>
+                        <span class="detail-value">{customer_address.get('line1', 'Not provided')}</span>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <h3>📋 Subscription Details</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Service Plan:</span>
+                        <span class="detail-value">{plan_name}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Vehicle Type:</span>
+                        <span class="detail-value">{vehicle_type}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Frequency:</span>
+                        <span class="detail-value">{frequency}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Monthly Amount:</span>
+                        <span class="detail-value">£{amount:.2f}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Start Date:</span>
+                        <span class="detail-value">{start_date}</span>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <h3>💳 Payment Information</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Stripe Customer ID:</span>
+                        <span class="detail-value">{stripe_customer_id}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Stripe Subscription ID:</span>
+                        <span class="detail-value">{stripe_subscription_id}</span>
+                    </div>
+                </div>
+                
+                <div class="action-required">
+                    <h3>⚡ Action Required</h3>
+                    <ul>
+                        <li>Contact customer within 24 hours to schedule first service</li>
+                        <li>Add customer to scheduling system</li>
+                        <li>Confirm service address and access details</li>
+                        <li>Set up recurring service schedule</li>
+                        <li>Send welcome package if applicable</li>
+                    </ul>
+                </div>
+                
+                <div class="footer">
+                    <p>Subscription created on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+                    <p><small>This is an automated notification from the subscription system.</small></p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+
+# Global instance
+email_service = EmailService()

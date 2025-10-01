@@ -19,6 +19,7 @@ from src.routes.driver import driver_bp
 from src.routes.auth import auth_bp
 from src.routes.payment import payment_bp
 from src.routes.admin import admin_bp
+from src.routes.stripe_routes import stripe_bp
 from src.services.subscription_service import SubscriptionService
 from src.services.notification_scheduler import notification_scheduler
 from datetime import timedelta
@@ -51,6 +52,7 @@ app.register_blueprint(driver_bp, url_prefix='/api')
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(payment_bp, url_prefix='/api/payment')
 app.register_blueprint(admin_bp, url_prefix='/api/admin')
+app.register_blueprint(stripe_bp, url_prefix='/api/stripe')
 
 # uncomment if you need to use database
 # Use /var/data for production (Render), local directory for development
