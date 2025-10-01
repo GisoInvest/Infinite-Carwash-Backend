@@ -10,30 +10,14 @@ class SubscriptionService:
     def initialize_subscription_plans():
         """Initialize default subscription plans"""
         
-        # Basic Services
+        # Basic Services - Updated with new Home Base pricing
         basic_plans = [
-            {
-                'name': 'Car Wash Subscription',
-                'description': 'Regular exterior car wash service to keep your vehicle clean and shining',
-                'service_type': 'car_wash',
-                'vehicle_types': ['small_car', 'medium_car', 'large_car', 'van'],
-                'base_price': 9.0,
-                'frequency_options': ['weekly', 'bi_weekly', 'monthly'],
-                'duration_minutes': 45,
-                'features': [
-                    'Exterior wash and rinse',
-                    'Wheel cleaning',
-                    'Basic drying',
-                    'Window cleaning (exterior)'
-                ],
-                'is_premium': False
-            },
             {
                 'name': 'Mini Valet Subscription',
                 'description': 'Comprehensive exterior and interior cleaning service',
                 'service_type': 'mini_valet',
                 'vehicle_types': ['small_car', 'medium_car', 'large_car', 'van'],
-                'base_price': 14.0,
+                'base_price': 35.0,  # Updated to Home Base pricing for Small Car
                 'frequency_options': ['weekly', 'bi_weekly', 'monthly'],
                 'duration_minutes': 90,
                 'features': [
@@ -50,7 +34,7 @@ class SubscriptionService:
                 'description': 'Complete premium cleaning service inside and out',
                 'service_type': 'full_valet',
                 'vehicle_types': ['small_car', 'medium_car', 'large_car', 'van'],
-                'base_price': 45.0,
+                'base_price': 80.0,  # Updated to Home Base pricing for Small Car
                 'frequency_options': ['bi_weekly', 'monthly'],
                 'duration_minutes': 120,
                 'features': [
@@ -66,14 +50,14 @@ class SubscriptionService:
             }
         ]
         
-        # Premium Services
+        # Premium Services - Updated with new Home Base pricing
         premium_plans = [
             {
                 'name': 'Interior Detailing Subscription',
                 'description': 'Professional interior deep cleaning and protection service',
                 'service_type': 'interior_detailing',
                 'vehicle_types': ['small_car', 'medium_car', 'large_car', 'van'],
-                'base_price': 120.0,
+                'base_price': 140.0,  # Updated to Home Base pricing
                 'frequency_options': ['monthly'],
                 'duration_minutes': 180,
                 'features': [
@@ -91,7 +75,7 @@ class SubscriptionService:
                 'description': 'Professional exterior paint correction and protection',
                 'service_type': 'exterior_detailing',
                 'vehicle_types': ['small_car', 'medium_car', 'large_car', 'van'],
-                'base_price': 200.0,
+                'base_price': 200.0,  # Same pricing for Home Base
                 'frequency_options': ['monthly'],
                 'duration_minutes': 300,
                 'features': [
@@ -109,7 +93,7 @@ class SubscriptionService:
                 'description': 'Complete professional detailing service - interior and exterior',
                 'service_type': 'full_detailing',
                 'vehicle_types': ['small_car', 'medium_car', 'large_car', 'van'],
-                'base_price': 300.0,
+                'base_price': 300.0,  # Same pricing for Home Base
                 'frequency_options': ['monthly'],
                 'duration_minutes': 480,
                 'features': [
@@ -129,7 +113,7 @@ class SubscriptionService:
                 'description': 'Single-stage machine polishing for paint enhancement',
                 'service_type': 'stage1_polishing',
                 'vehicle_types': ['small_car', 'medium_car', 'large_car', 'van'],
-                'base_price': 400.0,
+                'base_price': 450.0,  # Updated to Home Base pricing
                 'frequency_options': ['monthly'],
                 'duration_minutes': 240,
                 'features': [
@@ -146,7 +130,7 @@ class SubscriptionService:
                 'description': 'Two-stage machine polishing for maximum paint correction',
                 'service_type': 'stage2_polishing',
                 'vehicle_types': ['small_car', 'medium_car', 'large_car', 'van'],
-                'base_price': 550.0,
+                'base_price': 650.0,  # Updated to Home Base pricing
                 'frequency_options': ['monthly'],
                 'duration_minutes': 360,
                 'features': [

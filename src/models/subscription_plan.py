@@ -31,13 +31,50 @@ class SubscriptionPlan(db.Model):
         """Calculate monthly subscription price based on frequency and vehicle type"""
         base = self.base_price
         
-        # Vehicle type multipliers
-        vehicle_multipliers = {
-            'small_car': 1.0,
-            'medium_car': 1.2,
-            'large_car': 1.4,
-            'van': 1.6
-        }
+        # Vehicle type multipliers - Updated for Home Base pricing structure
+        if self.service_type == 'mini_valet':
+            vehicle_multipliers = {
+                'small_car': 1.0,      # £35 base
+                'medium_car': 1.43,    # £50 (50/35)
+                'large_car': 1.71,     # £60 (60/35)
+                'van': 2.14            # £75 (75/35)
+            }
+        elif self.service_type == 'full_valet':
+            vehicle_multipliers = {
+                'small_car': 1.0,      # £80 base
+                'medium_car': 1.25,    # £100 (100/80)
+                'large_car': 1.56,     # £125 (125/80)
+                'van': 1.75            # £140 (140/80)
+            }
+        elif self.service_type == 'interior_detailing':
+            vehicle_multipliers = {
+                'small_car': 1.0,      # £140 base (same for all)
+                'medium_car': 1.0,
+                'large_car': 1.0,
+                'van': 1.0
+            }
+        elif self.service_type == 'stage1_polishing':
+            vehicle_multipliers = {
+                'small_car': 1.0,      # £450 base (same for all)
+                'medium_car': 1.0,
+                'large_car': 1.0,
+                'van': 1.0
+            }
+        elif self.service_type == 'stage2_polishing':
+            vehicle_multipliers = {
+                'small_car': 1.0,      # £650 base (same for all)
+                'medium_car': 1.0,
+                'large_car': 1.0,
+                'van': 1.0
+            }
+        else:
+            # Default multipliers for other services
+            vehicle_multipliers = {
+                'small_car': 1.0,
+                'medium_car': 1.0,
+                'large_car': 1.0,
+                'van': 1.0
+            }
         
         # Frequency multipliers (monthly base)
         frequency_multipliers = {
