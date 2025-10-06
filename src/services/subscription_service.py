@@ -374,3 +374,6 @@ class SubscriptionService:
             print(f"Error scheduling recurring services: {str(e)}")
             return 0
 
+
+# Create global subscription service instance
+subscription_service = SubscriptionService()
