@@ -626,10 +626,6 @@ class EmailService:
         </html>
         """
 
-# Create global email service instance
-email_service = EmailService()
-
-
     def send_subscription_confirmation_customer(self, subscription_data):
         """Send subscription confirmation email to customer"""
         try:
@@ -1066,5 +1062,5 @@ email_service = EmailService()
         </html>
         """
 
-# Global instance
+# Create global email service instance
 email_service = EmailService()

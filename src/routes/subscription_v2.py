@@ -159,7 +159,7 @@ def get_subscription_plans():
                 'name': 'Exterior Detailing Subscription',
                 'description': 'Professional exterior paint correction and protection',
                 'service_type': 'exterior_detailing',
-                'base_price': 200.0,
+                'base_price': 260.0,
                 'duration_minutes': 300,
                 'is_premium': True,
                 'is_active': True,
@@ -175,10 +175,10 @@ def get_subscription_plans():
                 'frequency_options': ['monthly'],
                 'created_at': '2025-10-01T00:00:00.000000',
                 'pricing_examples': {
-                    'small_car': {'monthly': 200.0},
-                    'medium_car': {'monthly': 200.0},
-                    'large_car': {'monthly': 200.0},
-                    'van': {'monthly': 200.0}
+                    'small_car': {'monthly': 260.0},
+                    'medium_car': {'monthly': 260.0},
+                    'large_car': {'monthly': 260.0},
+                    'van': {'monthly': 260.0}
                 }
             },
             {
@@ -187,7 +187,7 @@ def get_subscription_plans():
                 'name': 'Full Detailing Subscription',
                 'description': 'Complete professional detailing service - interior and exterior',
                 'service_type': 'full_detailing',
-                'base_price': 300.0,
+                'base_price': 360.0,
                 'duration_minutes': 480,
                 'is_premium': True,
                 'is_active': True,
@@ -205,10 +205,10 @@ def get_subscription_plans():
                 'frequency_options': ['monthly'],
                 'created_at': '2025-10-01T00:00:00.000000',
                 'pricing_examples': {
-                    'small_car': {'monthly': 300.0},
-                    'medium_car': {'monthly': 300.0},
-                    'large_car': {'monthly': 300.0},
-                    'van': {'monthly': 300.0}
+                    'small_car': {'monthly': 360.0},
+                    'medium_car': {'monthly': 360.0},
+                    'large_car': {'monthly': 360.0},
+                    'van': {'monthly': 360.0}
                 }
             },
             {
