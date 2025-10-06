@@ -42,12 +42,22 @@ def create_checkout_session():
                 'error': 'Missing required fields: plan_id, customer_info (email, name), vehicle_type, frequency'
             }), 400
         
-        # Get subscription plan
+        # Get subscription plan with debugging
+        logger.info(f"Looking for plan_id: {plan_id}")
+        
+        # First, let's see all available plans
+        all_plans = SubscriptionPlan.query.all()
+        logger.info(f"Total plans in database: {len(all_plans)}")
+        for p in all_plans:
+            logger.info(f"Plan ID: {p.plan_id}, Active: {p.is_active}, Name: {p.name}")
+        
         plan = SubscriptionPlan.query.filter_by(plan_id=plan_id, is_active=True).first()
+        logger.info(f"Found plan: {plan}")
+        
         if not plan:
             return jsonify({
                 'success': False,
-                'error': 'Subscription plan not found'
+                'error': f'Subscription plan not found for plan_id: {plan_id}'
             }), 404
         
         # Create or get Stripe customer
