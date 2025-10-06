@@ -42,23 +42,48 @@ def create_checkout_session():
                 'error': 'Missing required fields: plan_id, customer_info (email, name), vehicle_type, frequency'
             }), 400
         
-        # Get subscription plan with debugging
+        # Get subscription plan - try multiple lookup methods
         logger.info(f"Looking for plan_id: {plan_id}")
         
-        # First, let's see all available plans
-        all_plans = SubscriptionPlan.query.all()
-        logger.info(f"Total plans in database: {len(all_plans)}")
-        for p in all_plans:
-            logger.info(f"Plan ID: {p.plan_id}, Active: {p.is_active}, Name: {p.name}")
-        
+        # First try exact plan_id match
         plan = SubscriptionPlan.query.filter_by(plan_id=plan_id, is_active=True).first()
-        logger.info(f"Found plan: {plan}")
+        
+        # If not found, try to match by service type (fallback)
+        if not plan:
+            # Extract service type from plan_id (e.g., "PLAN_MINI_VALET_HOME" -> "mini_valet")
+            if plan_id.startswith("PLAN_") and plan_id.endswith("_HOME"):
+                service_type = plan_id.replace("PLAN_", "").replace("_HOME", "").lower()
+                plan = SubscriptionPlan.query.filter_by(service_type=service_type, is_active=True).first()
+                logger.info(f"Fallback lookup by service_type '{service_type}': {plan}")
+        
+        # If still not found, try by name matching
+        if not plan:
+            plan_name_map = {
+                "PLAN_MINI_VALET_HOME": "Mini Valet Subscription",
+                "PLAN_FULL_VALET_HOME": "Full Valet Subscription", 
+                "PLAN_INTERIOR_DETAILING_HOME": "Interior Detailing Subscription",
+                "PLAN_EXTERIOR_DETAILING_HOME": "Exterior Detailing Subscription",
+                "PLAN_FULL_DETAILING_HOME": "Full Detailing Subscription",
+                "PLAN_STAGE1_POLISHING_HOME": "Stage 1 Polishing Subscription",
+                "PLAN_STAGE2_POLISHING_HOME": "Stage 2 Polishing Subscription"
+            }
+            if plan_id in plan_name_map:
+                plan = SubscriptionPlan.query.filter_by(name=plan_name_map[plan_id], is_active=True).first()
+                logger.info(f"Name-based lookup for '{plan_name_map[plan_id]}': {plan}")
         
         if not plan:
+            # Log all available plans for debugging
+            all_plans = SubscriptionPlan.query.all()
+            logger.error(f"Plan not found! Available plans:")
+            for p in all_plans:
+                logger.error(f"  - ID: {p.id}, Plan ID: {p.plan_id}, Name: {p.name}, Service: {p.service_type}, Active: {p.is_active}")
+            
             return jsonify({
                 'success': False,
                 'error': f'Subscription plan not found for plan_id: {plan_id}'
             }), 404
+        
+        logger.info(f"Successfully found plan: {plan.name} (ID: {plan.id})")
         
         # Create or get Stripe customer
         customer_result = stripe_service.create_customer(
