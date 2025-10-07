@@ -303,3 +303,27 @@ class StripeService:
 
 # Global instance
 stripe_service = StripeService()
+
+    def get_checkout_session(self, session_id: str) -> Dict[str, Any]:
+        """Retrieve a Stripe checkout session"""
+        try:
+            session = stripe.checkout.Session.retrieve(session_id)
+            
+            logger.info(f"Retrieved Stripe session: {session_id}")
+            return {
+                'success': True,
+                'session': session
+            }
+            
+        except stripe.error.StripeError as e:
+            logger.error(f"Stripe error retrieving session: {str(e)}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+        except Exception as e:
+            logger.error(f"Unexpected error retrieving session: {str(e)}")
+            return {
+                'success': False,
+                'error': 'Failed to retrieve session'
+            }
