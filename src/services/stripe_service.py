@@ -301,9 +301,6 @@ class StripeService:
         
         return frequency_mapping.get(frequency, ('month', 1))
 
-# Global instance
-stripe_service = StripeService()
-
     def get_checkout_session(self, session_id: str) -> Dict[str, Any]:
         """Retrieve a Stripe checkout session"""
         try:
@@ -327,3 +324,6 @@ stripe_service = StripeService()
                 'success': False,
                 'error': 'Failed to retrieve session'
             }
+
+# Global instance
+stripe_service = StripeService()
