@@ -143,8 +143,8 @@ def create_checkout_session():
         price_id = price_result['price_id']
         
         # Create checkout session
-        success_url = data.get('success_url', 'https://infinitemobilecarwashdetailing.co.uk/subscription?success=true&session_id={CHECKOUT_SESSION_ID}')
-        cancel_url = data.get('cancel_url', 'https://infinitemobilecarwashdetailing.co.uk/subscription?cancelled=true')
+        success_url = data.get('success_url', 'https://infinitemobilecarwashdetailing.co.uk/?booking_success=true&session_id={CHECKOUT_SESSION_ID}')
+        cancel_url = data.get('cancel_url', 'https://infinitemobilecarwashdetailing.co.uk/?booking_cancelled=true')
         
         metadata = {
             'plan_id': plan_id,
