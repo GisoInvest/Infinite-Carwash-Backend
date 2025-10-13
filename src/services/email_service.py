@@ -11,12 +11,12 @@ logger = logging.getLogger(__name__)
 
 class EmailService:
     def __init__(self):
-        # Email configuration - using Gmail SMTP as default
-        self.smtp_server = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
+        # Email configuration - using IONOS SMTP
+        self.smtp_server = os.getenv('SMTP_SERVER', 'smtp.ionos.co.uk')
         self.smtp_port = int(os.getenv('SMTP_PORT', '587'))
-        self.email_address = os.getenv('EMAIL_ADDRESS', 'infinitemobilecarwashdetailing@gmail.com')
-        self.email_password = os.getenv('EMAIL_PASSWORD', '')  # App password for Gmail
-        self.company_email = 'infinitemobilecarwashdetailing@gmail.com'
+        self.email_address = os.getenv('EMAIL_ADDRESS', 'opemipo.osekita@infinitemobilecarwashdetailing.co.uk')
+        self.email_password = os.getenv('EMAIL_PASSWORD', 'Cocomelone22*')
+        self.company_email = 'opemipo.osekita@infinitemobilecarwashdetailing.co.uk'
         
     def send_email(self, to_email, subject, html_content, cc_email=None):
         """Send email using SMTP"""
@@ -38,7 +38,6 @@ class EmailService:
             server = smtplib.SMTP(self.smtp_server, self.smtp_port)
             server.starttls()
             
-            # Use app password for Gmail or environment variable for other services
             if self.email_password:
                 server.login(self.email_address, self.email_password)
                 text = msg.as_string()
@@ -53,8 +52,7 @@ class EmailService:
                     logger.info(f"CC: {cc_email}")
                 logger.info(f"SUBJECT: {subject}")
             else:
-                # Fallback: log email if no password configured
-                logger.warning("No email password configured - logging email instead of sending")
+                logger.error("CRITICAL: No email password configured - logging email instead of sending")
                 logger.info(f"EMAIL WOULD BE SENT TO: {to_email}")
                 logger.info(f"SUBJECT: {subject}")
                 if cc_email:
@@ -309,57 +307,36 @@ class EmailService:
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>INFINITE MOBILE CARWASH & DETAILING</h1>
-                    <h2>Welcome to Our Premium Car Care Family!</h2>
+                    <h1>Welcome to the Club!</h1>
+                    <h2>Your Infinite Mobile Carwash Subscription</h2>
                 </div>
                 
                 <div class="content">
-                    <p>Thank you for subscribing to Infinite Mobile Carwash & Detailing!</p>
+                    <p>Dear Valued Customer,</p>
                     
-                    <p>We're thrilled to welcome you to our community of car enthusiasts who demand nothing but the best for their vehicles.</p>
+                    <p>Thank you for subscribing to our car care plan! Get ready for a consistently clean vehicle without the hassle. As a welcome gift, here is a <strong>20% discount</strong> on your first full-service booking!</p>
                     
                     <div class="discount-box">
-                        <h3 style="margin: 0 0 10px 0;">🎉 EXCLUSIVE WELCOME OFFER 🎉</h3>
-                        <div class="discount-code">{discount_code}</div>
-                        <h4 style="margin: 10px 0;">20% OFF Your First Service</h4>
-                        <p style="margin: 5px 0;"><strong>Valid until {expiry_date}</strong></p>
+                        <h3 style="margin-top: 0;">Your 20% Discount Code:</h3>
+                        <p class="discount-code">{discount_code}</p>
+                        <p>This code is valid until <strong>{expiry_date}</strong></p>
                     </div>
                     
                     <div style="text-align: center;">
-                        <a href="#" class="cta-button">Book Your Service Now</a>
+                        <a href="https://infinitemobilecarwashdetailing.co.uk/booking" class="cta-button">Book Your First Service Now</a>
                     </div>
                     
                     <div class="benefits">
-                        <h3>What You Can Expect:</h3>
+                        <h3>Your Subscription Benefits:</h3>
                         <ul>
-                            <li>🚗 <strong>Mobile Convenience:</strong> We come to your location</li>
-                            <li>🌟 <strong>Premium Products:</strong> Professional-grade equipment and materials</li>
-                            <li>⏰ <strong>Flexible Scheduling:</strong> 7 days a week service</li>
-                            <li>📱 <strong>Real-time Tracking:</strong> Know exactly when we'll arrive</li>
-                            <li>💯 <strong>Satisfaction Guarantee:</strong> Your happiness is our priority</li>
+                            <li>✅ Regular, scheduled car washes at your preferred location</li>
+                            <li>✅ Priority booking and flexible scheduling</li>
+                            <li>✅ Exclusive member discounts on additional services</li>
+                            <li>✅ Peace of mind knowing your car is always looking its best</li>
                         </ul>
                     </div>
                     
-                    <h3>Subscriber Benefits:</h3>
-                    <ul>
-                        <li>🎯 Exclusive discounts and special offers</li>
-                        <li>📚 Expert car care tips and maintenance advice</li>
-                        <li>🚀 Early access to new services and packages</li>
-                        <li>📅 Seasonal service reminders</li>
-                        <li>💎 Priority booking during peak times</li>
-                    </ul>
-                    
-                    <h3>How to Use Your Discount:</h3>
-                    <ol>
-                        <li>Visit our website and select your service</li>
-                        <li>Enter discount code <strong>{discount_code}</strong> at checkout</li>
-                        <li>Enjoy 20% off your total service cost</li>
-                        <li>Experience the Infinite difference!</li>
-                    </ol>
-                    
-                    <p>Ready to give your vehicle the premium care it deserves? Use your exclusive discount code and book your first service today!</p>
-                    
-                    <p>Welcome aboard!</p>
+                    <p>We'll be in touch shortly to schedule your first regular service. If you have any questions, feel free to contact us at any time.</p>
                     
                     <p>Best regards,<br>
                     <strong>The Infinite Mobile Carwash & Detailing Team</strong></p>
@@ -370,7 +347,6 @@ class EmailService:
                     Phone: 07403139086 | Email: infinitemobilecarwashdetailing@gmail.com<br>
                     Serving Derby & Surrounding Areas</p>
                     <p style="margin-top: 15px; font-size: 12px;">
-                        Subscription ID: {subscription_id}<br>
                         © 2024 Infinite Mobile Carwash & Detailing. All rights reserved.
                     </p>
                 </div>
@@ -380,7 +356,7 @@ class EmailService:
         """
     
     def _create_company_subscription_email(self, email, subscription_id, discount_code):
-        """Create HTML email for company subscription notification"""
+        """Create HTML email for company new subscription notification"""
         return f"""
         <!DOCTYPE html>
         <html>
@@ -390,101 +366,88 @@ class EmailService:
                 body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
                 .header {{ background-color: #000; color: #FFD700; padding: 20px; text-align: center; }}
                 .content {{ padding: 20px; }}
-                .subscriber-details {{ background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }}
+                .details {{ background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }}
             </style>
         </head>
         <body>
             <div class="header">
-                <h1>NEW SUBSCRIBER</h1>
+                <h1>NEW SUBSCRIPTION</h1>
                 <h2>Subscription ID: {subscription_id}</h2>
             </div>
             
             <div class="content">
-                <div class="subscriber-details">
-                    <h3>Subscriber Information</h3>
+                <div class="details">
+                    <h3>Customer Information</h3>
                     <p><strong>Email:</strong> {email}</p>
-                    <p><strong>Subscription Date:</strong> {datetime.now().strftime('%B %d, %Y at %I:%M %p')}</p>
-                    <p><strong>Discount Code Issued:</strong> {discount_code}</p>
-                    <p><strong>Discount Amount:</strong> 20% off first service</p>
-                    <p><strong>Code Expires:</strong> {(datetime.now() + timedelta(days=30)).strftime('%B %d, %Y')}</p>
+                    
+                    <h3>Subscription Details</h3>
+                    <p><strong>Subscription ID:</strong> {subscription_id}</p>
+                    <p><strong>Welcome Discount Code:</strong> {discount_code}</p>
+                    <p><strong>Notification Sent:</strong> {datetime.now().strftime('%B %d, %Y at %I:%M %p')}</p>
                 </div>
                 
                 <p><strong>Action Items:</strong></p>
                 <ul>
-                    <li>Add subscriber to marketing email list</li>
-                    <li>Track discount code usage</li>
-                    <li>Follow up if no booking within 2 weeks</li>
+                    <li>Contact customer to schedule first service</li>
+                    <li>Add customer to subscription list</li>
                 </ul>
             </div>
         </body>
         </html>
         """
 
-    def send_loyalty_reward_notification(self, reward_data):
-        """Send loyalty reward notification email to customer"""
+    def send_loyalty_reward_email(self, reward_data):
+        """Send loyalty reward email to customer and notify company"""
         try:
             customer_email = reward_data.get('customer_email')
-            customer_name = reward_data.get('customer_name')
-            rewards_earned = reward_data.get('rewards_earned', [])
-            total_bookings = reward_data.get('total_bookings', 0)
             
-            # Create subject based on rewards earned
-            if 'free_wash' in rewards_earned and '15_percent_discount' in rewards_earned:
-                subject = "🎉 Amazing! You've Earned BOTH a Free Wash AND 15% Discount!"
-            elif 'free_wash' in rewards_earned:
-                subject = "🎉 Congratulations! You've Earned a FREE Car Wash!"
-            elif '15_percent_discount' in rewards_earned:
-                subject = "🎉 Fantastic! You've Earned a 15% Discount!"
-            else:
-                subject = "🎉 Loyalty Rewards Update - Infinite Mobile Carwash"
+            # Create customer email
+            customer_subject = "🎉 A Special Thank You From Infinite Mobile Carwash!"
+            customer_html = self._create_loyalty_reward_email(reward_data)
+            customer_sent = self.send_email(customer_email, customer_subject, customer_html)
             
-            html_content = self._create_loyalty_reward_email(reward_data)
-            
-            # Send to customer
-            customer_sent = self.send_email(customer_email, subject, html_content)
-            
-            # Send notification to company
-            company_subject = f"Loyalty Reward Earned - {customer_name}"
+            # Create company notification
+            company_subject = f"Loyalty Reward Earned - {reward_data.get('customer_name')}"
             company_html = self._create_company_loyalty_notification(reward_data)
             company_sent = self.send_email(self.company_email, company_subject, company_html)
             
             return customer_sent and company_sent
             
         except Exception as e:
-            logger.error(f"Error sending loyalty reward notification: {str(e)}")
+            logger.error(f"Error sending loyalty reward email: {str(e)}")
             return False
-    
+
     def _create_loyalty_reward_email(self, reward_data):
-        """Create HTML email for loyalty reward notification"""
+        """Create HTML email for loyalty reward"""
         customer_name = reward_data.get('customer_name', 'Valued Customer')
-        rewards_earned = reward_data.get('rewards_earned', [])
         total_bookings = reward_data.get('total_bookings', 0)
+        rewards_earned = reward_data.get('rewards_earned', [])
         available_rewards = reward_data.get('available_rewards', [])
         
-        # Create rewards content
         rewards_content = ""
         if 'free_wash' in rewards_earned:
             rewards_content += """
             <div class="reward-box free-wash">
-                <h3>🆓 FREE CAR WASH EARNED!</h3>
-                <p>You've completed 5 services and earned a completely FREE car wash!</p>
+                <h3>Congratulations! You've Earned a FREE Wash!</h3>
+                <p>Enjoy a complimentary wash on your next booking as a thank you for your loyalty.</p>
             </div>
             """
-        
         if '15_percent_discount' in rewards_earned:
             rewards_content += """
             <div class="reward-box discount">
-                <h3>💰 15% DISCOUNT EARNED!</h3>
-                <p>You've completed 10 services and earned a 15% discount on your next booking!</p>
+                <h3>You've Unlocked a 15% Discount!</h3>
+                <p>Get 15% off any additional services on your next booking.</p>
             </div>
             """
         
-        # Available rewards section
         available_content = ""
         if available_rewards:
             available_content = "<h3>Your Available Rewards:</h3><ul>"
             for reward in available_rewards:
-                available_content += f"<li>🎁 {reward.get('description', '')}</li>"
+                if reward == 'free_wash':
+                    available_content += "<li><strong>FREE Wash</strong></li>"
+                elif reward == '15_percent_discount':
+                    available_content += "<li><strong>15% Discount</strong> on additional services</li>"
             available_content += "</ul>"
         
         return f"""
@@ -498,7 +461,7 @@ class EmailService:
                 .container {{ max-width: 600px; margin: 0 auto; background-color: #ffffff; }}
                 .header {{ background-color: #000000; color: #FFD700; padding: 30px 20px; text-align: center; }}
                 .content {{ padding: 30px 20px; }}
-                .reward-box {{ padding: 25px; border-radius: 10px; margin: 25px 0; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }}
+                .reward-box {{ color: white; padding: 25px; border-radius: 10px; margin: 25px 0; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }}
                 .free-wash {{ background: linear-gradient(135deg, #28a745, #20c997); color: white; }}
                 .discount {{ background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; }}
                 .celebration {{ background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #FFD700; }}
@@ -844,39 +807,44 @@ class EmailService:
                         <li>✅ Our team will arrive at your location with all necessary equipment</li>
                         <li>✅ You'll receive service reminders based on your preferences</li>
                         <li>✅ Your subscription will automatically renew each month</li>
-                        <li>✅ You can manage your subscription anytime through our customer portal</li>
+                        <li>✅ You can manage your subscription anytime</li>
                     </ul>
                 </div>
                 
                 <div class="contact-info">
-                    <h3>📞 Need Help?</h3>
+                    <h3>Questions or Special Requests?</h3>
+                    <p>We're here to help! Contact us anytime:</p>
+                    <p><strong>Email:</strong> infinitemobilecarwashdetailing@gmail.com</p>
                     <p><strong>Phone:</strong> 07403139086</p>
-                    <p><strong>Email:</strong> info@infinitemobilecarwashdetailing.co.uk</p>
-                    <p><strong>Website:</strong> www.infinitemobilecarwashdetailing.co.uk</p>
                 </div>
                 
-                <div class="footer">
-                    <p>Thank you for choosing Infinite Mobile Carwash & Detailing!</p>
-                    <p><small>This is an automated confirmation email. Please do not reply to this email.</small></p>
-                </div>
+                <p>We look forward to keeping your vehicle in pristine condition!</p>
+                
+                <p>Best regards,<br>
+                <strong>The Infinite Mobile Carwash & Detailing Team</strong></p>
+            </div>
+            
+            <div class="footer">
+                <p>© 2024 Infinite Mobile Carwash & Detailing. All rights reserved.</p>
             </div>
         </body>
         </html>
         """
-    
+
     def _create_subscription_business_notification(self, subscription_data):
-        """Create HTML email for business subscription notification"""
+        """Create HTML email for new subscription notification to business"""
         customer_info = subscription_data.get('customer_info', {})
-        customer_name = customer_info.get('name', 'Unknown')
-        customer_email = customer_info.get('email', 'Unknown')
-        customer_phone = customer_info.get('phone', 'Not provided')
-        customer_address = customer_info.get('address', {})
+        customer_name = customer_info.get('name', 'N/A')
+        customer_email = customer_info.get('email', 'N/A')
+        customer_phone = customer_info.get('phone', 'N/A')
+        service_address = customer_info.get('address', 'N/A')
         
-        plan_name = subscription_data.get('plan_name', 'Car Care Subscription')
-        vehicle_type = subscription_data.get('vehicle_type', '').replace('_', ' ').title()
-        frequency = subscription_data.get('frequency', '').replace('_', ' ').title()
+        plan_name = subscription_data.get('plan_name', 'N/A')
+        vehicle_type = subscription_data.get('vehicle_type', 'N/A').replace('_', ' ').title()
+        frequency = subscription_data.get('frequency', 'N/A').replace('_', ' ').title()
         amount = subscription_data.get('amount', 0)
         start_date = subscription_data.get('start_date', datetime.now().strftime('%Y-%m-%d'))
+        
         stripe_customer_id = subscription_data.get('stripe_customer_id', 'N/A')
         stripe_subscription_id = subscription_data.get('stripe_subscription_id', 'N/A')
         
@@ -892,10 +860,10 @@ class EmailService:
                     font-family: 'Arial', sans-serif;
                     line-height: 1.6;
                     color: #333;
-                    max-width: 700px;
+                    max-width: 600px;
                     margin: 0 auto;
                     padding: 20px;
-                    background-color: #f8f9fa;
+                    background-color: #f0f2f5;
                 }}
                 .container {{
                     background: white;
@@ -905,68 +873,65 @@ class EmailService:
                 }}
                 .header {{
                     text-align: center;
-                    background: linear-gradient(135deg, #dc3545, #c82333);
+                    background: linear-gradient(135deg, #ff9800, #f57c00);
                     color: white;
-                    padding: 25px;
+                    padding: 30px;
                     border-radius: 15px;
                     margin-bottom: 30px;
                 }}
                 .header h1 {{
                     margin: 0;
-                    font-size: 24px;
+                    font-size: 28px;
                 }}
                 .notification-icon {{
-                    font-size: 36px;
-                    margin-bottom: 10px;
+                    font-size: 48px;
+                    margin-bottom: 15px;
                 }}
-                .info-section {{
+                .section {{
                     background: #f8f9fa;
-                    padding: 20px;
+                    padding: 25px;
                     border-radius: 10px;
-                    margin: 15px 0;
-                    border-left: 5px solid #007bff;
+                    margin: 20px 0;
+                    border-left: 5px solid #ff9800;
                 }}
-                .info-section h3 {{
-                    color: #007bff;
+                .section h3 {{
+                    color: #f57c00;
                     margin-top: 0;
-                    font-size: 16px;
+                    font-size: 18px;
                 }}
                 .detail-row {{
                     display: flex;
                     justify-content: space-between;
-                    margin: 8px 0;
-                    padding: 5px 0;
+                    margin: 10px 0;
+                    padding: 8px 0;
                     border-bottom: 1px solid #e9ecef;
                 }}
                 .detail-label {{
                     font-weight: bold;
                     color: #495057;
-                    flex: 1;
                 }}
                 .detail-value {{
-                    color: #007bff;
+                    color: #333;
                     font-weight: 600;
-                    flex: 2;
-                    text-align: right;
                 }}
-                .action-required {{
-                    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
-                    padding: 20px;
+                .action-items {{
+                    background: linear-gradient(135deg, #e8f5e8, #f0f8f0);
+                    padding: 25px;
                     border-radius: 10px;
-                    border: 2px solid #ffc107;
                     margin: 20px 0;
+                    border: 2px solid #28a745;
                 }}
-                .action-required h3 {{
-                    color: #856404;
+                .action-items h3 {{
+                    color: #155724;
                     margin-top: 0;
                 }}
-                .action-required ul {{
+                .action-items ul {{
                     margin: 0;
                     padding-left: 20px;
                 }}
-                .action-required li {{
-                    margin: 5px 0;
-                    color: #856404;
+                .action-items li {{
+                    margin: 8px 0;
+                    color: #155724;
                 }}
                 .footer {{
                     text-align: center;
@@ -974,7 +939,6 @@ class EmailService:
                     padding-top: 20px;
                     border-top: 2px solid #e9ecef;
                     color: #6c757d;
-                    font-size: 14px;
                 }}
             </style>
         </head>
@@ -983,11 +947,11 @@ class EmailService:
                 <div class="header">
                     <div class="notification-icon">🔔</div>
                     <h1>New Subscription Created</h1>
-                    <p>Customer: {customer_name}</p>
+                    <p>A new customer has subscribed!</p>
                 </div>
                 
-                <div class="info-section">
-                    <h3>👤 Customer Information</h3>
+                <div class="section">
+                    <h3>👤 Customer Details</h3>
                     <div class="detail-row">
                         <span class="detail-label">Name:</span>
                         <span class="detail-value">{customer_name}</span>
@@ -1001,13 +965,13 @@ class EmailService:
                         <span class="detail-value">{customer_phone}</span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">Address:</span>
-                        <span class="detail-value">{customer_address.get('line1', 'Not provided')}</span>
+                        <span class="detail-label">Service Address:</span>
+                        <span class="detail-value">{service_address}</span>
                     </div>
                 </div>
                 
-                <div class="info-section">
-                    <h3>📋 Subscription Details</h3>
+                <div class="section">
+                    <h3>📦 Subscription Details</h3>
                     <div class="detail-row">
                         <span class="detail-label">Service Plan:</span>
                         <span class="detail-value">{plan_name}</span>
@@ -1017,8 +981,8 @@ class EmailService:
                         <span class="detail-value">{vehicle_type}</span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">Frequency:</span>
-                        <span class="detail-value">{frequency}</span>
+                        <span class="detail-label">Service Frequency:</span>
+                        <span class_name="detail-value">{frequency}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Monthly Amount:</span>
@@ -1030,8 +994,8 @@ class EmailService:
                     </div>
                 </div>
                 
-                <div class="info-section">
-                    <h3>💳 Payment Information</h3>
+                <div class="section">
+                    <h3>💳 Stripe Information</h3>
                     <div class="detail-row">
                         <span class="detail-label">Stripe Customer ID:</span>
                         <span class="detail-value">{stripe_customer_id}</span>
@@ -1042,25 +1006,21 @@ class EmailService:
                     </div>
                 </div>
                 
-                <div class="action-required">
-                    <h3>⚡ Action Required</h3>
+                <div class="action-items">
+                    <h3>✅ Action Required</h3>
                     <ul>
-                        <li>Contact customer within 24 hours to schedule first service</li>
-                        <li>Add customer to scheduling system</li>
-                        <li>Confirm service address and access details</li>
-                        <li>Set up recurring service schedule</li>
-                        <li>Send welcome package if applicable</li>
+                        <li>Contact the customer within 24 hours to schedule their first service.</li>
+                        <li>Add the customer to the scheduling system.</li>
+                        <li>Ensure all details are correct and update if necessary.</li>
                     </ul>
                 </div>
                 
-                <div class="footer">
-                    <p>Subscription created on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
-                    <p><small>This is an automated notification from the subscription system.</small></p>
-                </div>
+            </div>
+            
+            <div class="footer">
+                <p>This is an automated notification from the Infinite Mobile Carwash & Detailing booking system.</p>
             </div>
         </body>
         </html>
         """
 
-# Create global email service instance
-email_service = EmailService()

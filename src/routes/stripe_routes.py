@@ -285,20 +285,24 @@ def handle_checkout_completed(session):
                     'stripe_subscription_id': session['subscription']
                 }
                 
+                logger.info(f"Preparing to send emails for subscription {result['subscription_id']}")
+                logger.info(f"Email data: {json.dumps(email_data, indent=2)}")
+
                 # Send confirmation email to customer
                 customer_email_sent = email_service.send_subscription_confirmation_customer(email_data)
                 if customer_email_sent:
-                    logger.info(f"Confirmation email sent to customer: {customer_email}")
+                    logger.info(f"Successfully sent confirmation email to customer: {customer_email}")
                 else:
-                    logger.error(f"Failed to send confirmation email to customer: {customer_email}")
+                    logger.error(f"FAILED to send confirmation email to customer: {customer_email}")
                 
                 # Send notification email to business
                 business_email_sent = email_service.send_subscription_notification_business(email_data)
                 if business_email_sent:
-                    logger.info("Notification email sent to business")
+                    logger.info("Successfully sent notification email to business")
                 else:
-                    logger.error("Failed to send notification email to business")
-            
+                    logger.error("FAILED to send notification email to business")
+            else:
+                logger.error(f"Plan not found for plan_id: {plan_id}. Cannot send emails.")
         else:
             logger.error(f"Failed to create subscription in database: {result['error']}")
         
@@ -401,3 +405,4 @@ def cancel_subscription():
             'success': False,
             'error': 'Failed to cancel subscription'
         }), 500
+

@@ -1,0 +1,9 @@
+2025-10-13 17:02:35,463 - INFO - Running email sending test...
+2025-10-13 17:02:35,463 - INFO - Python executable: /usr/bin/python3
+2025-10-13 17:02:35,463 - INFO - Attempting to send email to: opemipo.osekita@infinitemobilecarwashdetailing.co.uk
+2025-10-13 17:02:35,463 - INFO - SMTP Server: smtp.ionos.co.uk:587
+2025-10-13 17:02:35,463 - INFO - Email Address: opemipo.osekita@infinitemobilecarwashdetailing.co.uk
+2025-10-13 17:02:35,463 - INFO - Email Password is set: True
+2025-10-13 17:02:37,279 - INFO - EMAIL SUCCESSFULLY SENT TO: opemipo.osekita@infinitemobilecarwashdetailing.co.uk
+2025-10-13 17:02:37,279 - INFO - SUBJECT: Test Email from Car Wash App
+2025-10-13 17:02:37,279 - INFO - Email sending test PASSED.
