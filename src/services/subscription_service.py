@@ -384,10 +384,14 @@ class SubscriptionService:
             from src.services.email_service import email_service
             
             # Create new subscription
+            customer_info = subscription_data.get('customer_info', {})
             subscription = CustomerSubscription(
                 subscription_id=CustomerSubscription.generate_subscription_id(),
                 plan_id=subscription_data['plan_id'],
-                customer_info=subscription_data['customer_info'],
+                customer_name=customer_info.get('name', ''),
+                customer_email=customer_info.get('email', ''),
+                customer_phone=customer_info.get('phone', ''),
+                customer_address=customer_info.get('address', ''),
                 vehicle_type=subscription_data['vehicle_type'],
                 frequency=subscription_data['frequency'],
                 stripe_customer_id=subscription_data.get('stripe_customer_id'),
