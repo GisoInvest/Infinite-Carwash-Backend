@@ -9,18 +9,22 @@ class SendGridEmailService:
     def __init__(self):
         """Initialize SendGrid email service"""
         self.api_key = os.environ.get('SENDGRID_API_KEY')
-        self.from_email = os.environ.get('FROM_EMAIL', 'opemipo.osekita@infinitemobilecarwashdetailing.co.uk')
-        self.business_email = os.environ.get('BUSINESS_EMAIL', 'opemipo.osekita@infinitemobilecarwashdetailing.co.uk')
+        self.from_email = os.environ.get('FROM_EMAIL', 'infinitemobilecarwashdetailing@gmail.com')
+        self.business_email = os.environ.get('BUSINESS_EMAIL', 'infinitemobilecarwashdetailing@gmail.com')
         
         if not self.api_key:
-            logger.error("SENDGRID_API_KEY environment variable not set")
-            raise ValueError("SendGrid API key is required")
-        
-        self.sg = sendgrid.SendGridAPIClient(api_key=self.api_key)
-        logger.info("SendGrid email service initialized successfully")
+            logger.warning("SENDGRID_API_KEY environment variable not set - email service will be disabled")
+            self.sg = None
+        else:
+            self.sg = sendgrid.SendGridAPIClient(api_key=self.api_key)
+            logger.info("SendGrid email service initialized successfully")
     
     def send_email(self, to_email, subject, content_text, content_html=None):
         """Send email using SendGrid API"""
+        if not self.sg:
+            logger.warning(f"SendGrid not configured - cannot send email to {to_email}")
+            return False
+            
         try:
             from_email_obj = Email(self.from_email)
             to_email_obj = To(to_email)
