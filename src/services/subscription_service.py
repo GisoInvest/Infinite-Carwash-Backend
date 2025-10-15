@@ -376,11 +376,7 @@ class SubscriptionService:
             db.session.rollback()
             print(f"Error scheduling recurring services: {str(e)}")
             return 0
-
-
-# Create global subscription service instance
-subscription_service = SubscriptionService()
-
+    
     @staticmethod
     def create_subscription(subscription_data):
         """Create a new subscription in the database"""
@@ -433,6 +429,7 @@ subscription_service = SubscriptionService()
             return today + timedelta(days=30)
         else:
             return today + timedelta(days=30)  # Default to monthly
+
 
 # Create global instance
 subscription_service = SubscriptionService()
