@@ -6,7 +6,7 @@ from datetime import datetime
 from src.services.stripe_service import stripe_service
 from src.models.subscription_plan import SubscriptionPlan
 from src.services.subscription_service import subscription_service
-from src.services.email_service import email_service
+from src.services.sendgrid_email_service import sendgrid_email_service
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -288,15 +288,27 @@ def handle_checkout_completed(session):
                 logger.info(f"Preparing to send emails for subscription {result['subscription_id']}")
                 logger.info(f"Email data: {json.dumps(email_data, indent=2)}")
 
-                # Send confirmation email to customer
-                customer_email_sent = email_service.send_subscription_confirmation_customer(email_data)
+                # Send confirmation email to customer using SendGrid
+                customer_email_sent = sendgrid_email_service.send_customer_confirmation_email(
+                    customer_info=subscription_data['customer_info'],
+                    plan_name=plan.name,
+                    vehicle_type=vehicle_type,
+                    frequency=frequency,
+                    amount=amount
+                )
                 if customer_email_sent:
                     logger.info(f"Successfully sent confirmation email to customer: {customer_email}")
                 else:
                     logger.error(f"FAILED to send confirmation email to customer: {customer_email}")
                 
-                # Send notification email to business
-                business_email_sent = email_service.send_subscription_notification_business(email_data)
+                # Send notification email to business using SendGrid
+                business_email_sent = sendgrid_email_service.send_business_notification_email(
+                    customer_info=subscription_data['customer_info'],
+                    plan_name=plan.name,
+                    vehicle_type=vehicle_type,
+                    frequency=frequency,
+                    amount=amount
+                )
                 if business_email_sent:
                     logger.info("Successfully sent notification email to business")
                 else:
