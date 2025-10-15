@@ -283,3 +283,149 @@ class SendGridEmailService:
 
 # Create global instance
 sendgrid_email_service = SendGridEmailService()
+
+    def send_subscription_welcome(self, email, subscription_id):
+        """Send subscription welcome email with discount code using SendGrid"""
+        try:
+            from datetime import datetime, timedelta
+            
+            discount_code = f"SAVE20-{subscription_id[-4:]}"
+            expiry_date = (datetime.now() + timedelta(days=30)).strftime('%B %d, %Y')
+            
+            subject = "Welcome to Infinite Mobile Carwash - 20% OFF Your First Service!"
+            
+            # HTML content for the welcome email
+            html_content = f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }}
+                    .container {{ max-width: 600px; margin: 0 auto; background-color: #ffffff; }}
+                    .header {{ background-color: #000000; color: #FFD700; padding: 30px 20px; text-align: center; }}
+                    .content {{ padding: 30px 20px; }}
+                    .discount-box {{ background-color: #FFD700; color: #000; padding: 25px; border-radius: 10px; margin: 25px 0; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }}
+                    .discount-code {{ font-size: 28px; font-weight: bold; letter-spacing: 3px; margin: 10px 0; }}
+                    .cta-button {{ background-color: #FFD700; color: #000; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; margin: 20px 0; }}
+                    .benefits {{ background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }}
+                    .footer {{ background-color: #f1f1f1; padding: 20px; text-align: center; font-size: 14px; color: #666; }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>Welcome to the Club!</h1>
+                        <h2>Your Infinite Mobile Carwash Subscription</h2>
+                    </div>
+                    
+                    <div class="content">
+                        <p>Dear Valued Customer,</p>
+                        
+                        <p>Thank you for subscribing to our car care plan! Get ready for a consistently clean vehicle without the hassle. As a welcome gift, here is a <strong>20% discount</strong> on your first full-service booking!</p>
+                        
+                        <div class="discount-box">
+                            <h3 style="margin-top: 0;">Your 20% Discount Code:</h3>
+                            <p class="discount-code">{discount_code}</p>
+                            <p>This code is valid until <strong>{expiry_date}</strong></p>
+                        </div>
+                        
+                        <div style="text-align: center;">
+                            <a href="https://infinitemobilecarwashdetailing.co.uk/booking" class="cta-button">Book Your First Service Now</a>
+                        </div>
+                        
+                        <div class="benefits">
+                            <h3>Your Subscription Benefits:</h3>
+                            <ul>
+                                <li>✅ Regular, scheduled car washes at your preferred location</li>
+                                <li>✅ Priority booking and flexible scheduling</li>
+                                <li>✅ Exclusive member discounts on additional services</li>
+                                <li>✅ Peace of mind knowing your car is always looking its best</li>
+                            </ul>
+                        </div>
+                        
+                        <p>We'll be in touch shortly to schedule your first regular service. If you have any questions, feel free to contact us at any time.</p>
+                        
+                        <p>Best regards,<br>
+                        <strong>The Infinite Mobile Carwash & Detailing Team</strong></p>
+                    </div>
+                    
+                    <div class="footer">
+                        <p><strong>Contact Information</strong><br>
+                        Phone: 07403139086 | Email: infinitemobilecarwashdetailing@gmail.com<br>
+                        Serving Derby & Surrounding Areas</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """
+            
+            # Plain text version
+            text_content = f"""
+            Welcome to Infinite Mobile Carwash & Detailing!
+            
+            Thank you for subscribing to our car care plan! As a welcome gift, here is your 20% discount code for your first service:
+            
+            DISCOUNT CODE: {discount_code}
+            Valid until: {expiry_date}
+            
+            Your Subscription Benefits:
+            - Regular, scheduled car washes at your preferred location
+            - Priority booking and flexible scheduling  
+            - Exclusive member discounts on additional services
+            - Peace of mind knowing your car is always looking its best
+            
+            Book your first service: https://infinitemobilecarwashdetailing.co.uk/booking
+            
+            Contact us:
+            Phone: 07403139086
+            Email: infinitemobilecarwashdetailing@gmail.com
+            
+            Best regards,
+            The Infinite Mobile Carwash & Detailing Team
+            """
+            
+            # Send to customer
+            customer_sent = self.send_email(email, subject, text_content, html_content)
+            
+            # Send notification to company
+            if customer_sent:
+                company_subject = f"New Newsletter Subscription - {subscription_id}"
+                company_html = f"""
+                <html>
+                <body style="font-family: Arial, sans-serif;">
+                    <h2 style="color: #2c5aa0;">New Newsletter Subscription</h2>
+                    <p>A new customer has subscribed to the newsletter:</p>
+                    <ul>
+                        <li><strong>Email:</strong> {email}</li>
+                        <li><strong>Subscription ID:</strong> {subscription_id}</li>
+                        <li><strong>Discount Code:</strong> {discount_code}</li>
+                        <li><strong>Valid Until:</strong> {expiry_date}</li>
+                    </ul>
+                    <p>The customer has been sent their welcome email with the discount code.</p>
+                </body>
+                </html>
+                """
+                
+                company_text = f"""
+                New Newsletter Subscription
+                
+                A new customer has subscribed:
+                - Email: {email}
+                - Subscription ID: {subscription_id}
+                - Discount Code: {discount_code}
+                - Valid Until: {expiry_date}
+                """
+                
+                company_sent = self.send_email(self.business_email, company_subject, company_text, company_html)
+                return customer_sent and company_sent
+            
+            return customer_sent
+            
+        except Exception as e:
+            logger.error(f"Error sending subscription welcome email: {str(e)}")
+            return False
+
+# Create a global instance
+sendgrid_email_service = SendGridEmailService()
