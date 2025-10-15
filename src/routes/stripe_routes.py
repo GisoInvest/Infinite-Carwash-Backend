@@ -332,14 +332,24 @@ def handle_checkout_completed(session):
                     logger.error("FAILED to send notification email to business")
                 
                 # Send Discord notification
+                # Prepare customer data with all required fields
+                customer_data = {
+                    'name': subscription_data['customer_info'].get('name', 'N/A'),
+                    'email': subscription_data['customer_info'].get('email', 'N/A'),
+                    'phone': subscription_data['customer_info'].get('phone', 'N/A'),
+                    'address': subscription_data['customer_info'].get('address', 'N/A'),
+                    'city': metadata.get('city', 'N/A'),
+                    'postal_code': metadata.get('postal_code', 'N/A')
+                }
+                
                 discord_sent = discord_service.send_booking_notification(
-                    customer_data=subscription_data['customer_info'],
+                    customer_data=customer_data,
                     subscription_data={
                         'plan_name': plan.name,
                         'frequency': frequency
                     },
                     payment_data={
-                        'amount': amount,
+                        'amount': amount,  # Amount is already in pence from Stripe
                         'status': 'completed',
                         'payment_intent_id': session.get('payment_intent', 'N/A'),
                         'customer_id': session['customer']

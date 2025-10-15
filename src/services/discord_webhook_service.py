@@ -38,7 +38,7 @@ class DiscordWebhookService:
                     },
                     {
                         "name": "💰 Subscription Details",
-                        "value": f"**Plan:** {subscription_data.get('plan_name', 'N/A')}\n**Amount:** ${payment_data.get('amount', 0)/100:.2f}\n**Frequency:** {subscription_data.get('frequency', 'N/A')}",
+                        "value": f"**Plan:** {subscription_data.get('plan_name', 'N/A')}\n**Amount:** £{payment_data.get('amount', 0)/100:.2f}\n**Frequency:** {subscription_data.get('frequency', 'N/A')}",
                         "inline": True
                     },
                     {
