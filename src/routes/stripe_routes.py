@@ -7,6 +7,7 @@ from src.services.stripe_service import stripe_service
 from src.models.subscription_plan import SubscriptionPlan
 from src.services.subscription_service import subscription_service
 from src.services.sendgrid_email_service import sendgrid_email_service
+from src.services.discord_webhook_service import discord_service
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -313,6 +314,25 @@ def handle_checkout_completed(session):
                     logger.info("Successfully sent notification email to business")
                 else:
                     logger.error("FAILED to send notification email to business")
+                
+                # Send Discord notification
+                discord_sent = discord_service.send_booking_notification(
+                    customer_data=subscription_data['customer_info'],
+                    subscription_data={
+                        'plan_name': plan.name,
+                        'frequency': frequency
+                    },
+                    payment_data={
+                        'amount': amount,
+                        'status': 'completed',
+                        'payment_intent_id': session.get('payment_intent', 'N/A'),
+                        'customer_id': session['customer']
+                    }
+                )
+                if discord_sent:
+                    logger.info("Successfully sent Discord notification")
+                else:
+                    logger.error("FAILED to send Discord notification")
             else:
                 logger.error(f"Plan not found for plan_id: {plan_id}. Cannot send emails.")
         else:
