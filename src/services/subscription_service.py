@@ -3,6 +3,9 @@ from src.models.subscription_plan import SubscriptionPlan, CustomerSubscription,
 from src.models.notification import ServiceNotification, LiveNotification
 from datetime import datetime, date, timedelta
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 class SubscriptionService:
     
@@ -376,4 +379,60 @@ class SubscriptionService:
 
 
 # Create global subscription service instance
+subscription_service = SubscriptionService()
+
+    @staticmethod
+    def create_subscription(subscription_data):
+        """Create a new subscription in the database"""
+        try:
+            from src.services.email_service import email_service
+            
+            # Create new subscription
+            subscription = CustomerSubscription(
+                subscription_id=CustomerSubscription.generate_subscription_id(),
+                plan_id=subscription_data['plan_id'],
+                customer_info=subscription_data['customer_info'],
+                vehicle_type=subscription_data['vehicle_type'],
+                frequency=subscription_data['frequency'],
+                stripe_customer_id=subscription_data.get('stripe_customer_id'),
+                stripe_subscription_id=subscription_data.get('stripe_subscription_id'),
+                status=subscription_data.get('status', 'active'),
+                created_at=datetime.utcnow(),
+                next_service_date=SubscriptionService.calculate_next_service_date(subscription_data['frequency'])
+            )
+            
+            db.session.add(subscription)
+            db.session.commit()
+            
+            logger.info(f"Subscription created successfully: {subscription.subscription_id}")
+            
+            return {
+                'success': True,
+                'subscription_id': subscription.subscription_id,
+                'subscription': subscription
+            }
+            
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"Error creating subscription: {str(e)}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+    
+    @staticmethod
+    def calculate_next_service_date(frequency):
+        """Calculate the next service date based on frequency"""
+        today = date.today()
+        
+        if frequency == 'weekly':
+            return today + timedelta(days=7)
+        elif frequency == 'bi_weekly':
+            return today + timedelta(days=14)
+        elif frequency == 'monthly':
+            return today + timedelta(days=30)
+        else:
+            return today + timedelta(days=30)  # Default to monthly
+
+# Create global instance
 subscription_service = SubscriptionService()
