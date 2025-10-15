@@ -385,19 +385,28 @@ class SubscriptionService:
             
             # Create new subscription
             customer_info = subscription_data.get('customer_info', {})
+            # Calculate pricing for the subscription
+            plan = SubscriptionPlan.query.filter_by(plan_id=subscription_data['plan_id']).first()
+            monthly_price = 0.0
+            if plan:
+                monthly_price = plan.calculate_subscription_price(
+                    subscription_data['frequency'],
+                    subscription_data['vehicle_type']
+                )
+            
             subscription = CustomerSubscription(
                 subscription_id=CustomerSubscription.generate_subscription_id(),
+                customer_id=subscription_data.get('stripe_customer_id', f"cus_{CustomerSubscription.generate_subscription_id()}"),
                 plan_id=subscription_data['plan_id'],
                 customer_name=customer_info.get('name', ''),
                 customer_email=customer_info.get('email', ''),
                 customer_phone=customer_info.get('phone', ''),
-                customer_address=customer_info.get('address', ''),
+                address=customer_info.get('address', ''),
                 vehicle_type=subscription_data['vehicle_type'],
                 frequency=subscription_data['frequency'],
-                stripe_customer_id=subscription_data.get('stripe_customer_id'),
-                stripe_subscription_id=subscription_data.get('stripe_subscription_id'),
+                start_date=date.today(),
+                monthly_price=monthly_price,
                 status=subscription_data.get('status', 'active'),
-                created_at=datetime.utcnow(),
                 next_service_date=SubscriptionService.calculate_next_service_date(subscription_data['frequency'])
             )
             
