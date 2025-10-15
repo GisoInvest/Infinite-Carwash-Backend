@@ -266,6 +266,22 @@ def handle_checkout_completed(session):
             
             # Get plan details for email
             plan = SubscriptionPlan.query.filter_by(plan_id=plan_id, is_active=True).first()
+            
+            # If plan not found by plan_id, try to find by name or fallback to first active plan
+            if not plan:
+                logger.warning(f"Plan not found for plan_id: {plan_id}. Trying fallback lookup.")
+                # Try to find by service type or name
+                if 'mini' in plan_id.lower() or 'valet' in plan_id.lower():
+                    plan = SubscriptionPlan.query.filter(
+                        SubscriptionPlan.name.ilike('%mini%'),
+                        SubscriptionPlan.is_active == True
+                    ).first()
+                
+                # If still not found, get the first active plan as fallback
+                if not plan:
+                    plan = SubscriptionPlan.query.filter_by(is_active=True).first()
+                    logger.warning(f"Using fallback plan: {plan.name if plan else 'None'}")
+            
             if plan:
                 # Calculate amount for email
                 amount = stripe_service.calculate_subscription_amount(
