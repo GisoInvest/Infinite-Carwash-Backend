@@ -281,9 +281,6 @@ class SendGridEmailService:
             logger.error(f"Error sending business notification email: {str(e)}")
             return False
 
-# Create global instance
-sendgrid_email_service = SendGridEmailService()
-
     def send_subscription_welcome(self, email, subscription_id):
         """Send subscription welcome email with discount code using SendGrid"""
         try:
