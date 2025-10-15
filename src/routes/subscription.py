@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_cors import cross_origin
 import uuid
 from datetime import datetime
-from src.services.sendgrid_email_service import sendgrid_email_service
+from src.services.email_service import email_service
 
 subscription_bp = Blueprint('subscription', __name__)
 
@@ -26,7 +26,7 @@ def create_subscription():
         
         # Send welcome email with 20% discount using the new email service
         try:
-            email_sent = sendgrid_email_service.send_subscription_welcome(customer_email, subscription_id)
+            email_sent = email_service.send_subscription_welcome(customer_email, subscription_id)
             if email_sent:
                 print(f"Subscription welcome emails sent successfully for {subscription_id}")
             else:
