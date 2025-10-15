@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: carwash-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: DISCORD_WEBHOOK_URL
+        sync: false  # This will be set manually in Render dashboard
+      - key: STRIPE_SECRET_KEY
+        sync: false  # This will be set manually in Render dashboard
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false  # This will be set manually in Render dashboard
