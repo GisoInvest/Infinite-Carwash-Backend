@@ -426,3 +426,169 @@ class SendGridEmailService:
 
 # Create a global instance
 sendgrid_email_service = SendGridEmailService()
+
+    def send_customer_confirmation_email(self, customer_info, plan_name, vehicle_type, frequency, amount):
+        """Send booking confirmation email to customer using SendGrid"""
+        try:
+            from datetime import datetime, timedelta
+            
+            customer_email = customer_info.get('email')
+            customer_name = customer_info.get('name', 'Valued Customer')
+            customer_phone = customer_info.get('phone', 'N/A')
+            customer_address = customer_info.get('address', 'N/A')
+            
+            # Convert amount from pence to pounds
+            amount_pounds = amount / 100
+            
+            # Calculate next service date (assuming monthly for now)
+            next_service = (datetime.now() + timedelta(days=30)).strftime('%B %d, %Y')
+            
+            subject = f"Booking Confirmed - {plan_name} Service"
+            
+            # HTML content for the confirmation email
+            html_content = f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }}
+                    .container {{ max-width: 600px; margin: 0 auto; background-color: #ffffff; }}
+                    .header {{ background-color: #000000; color: #FFD700; padding: 30px 20px; text-align: center; }}
+                    .content {{ padding: 30px 20px; }}
+                    .booking-details {{ background-color: #f8f9fa; padding: 25px; border-radius: 10px; margin: 25px 0; }}
+                    .detail-row {{ display: flex; justify-content: space-between; margin: 10px 0; padding: 8px 0; border-bottom: 1px solid #eee; }}
+                    .detail-label {{ font-weight: bold; color: #555; }}
+                    .detail-value {{ color: #333; }}
+                    .highlight {{ background-color: #FFD700; color: #000; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; }}
+                    .contact-info {{ background-color: #000; color: #FFD700; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; }}
+                    .footer {{ background-color: #f1f1f1; padding: 20px; text-align: center; font-size: 14px; color: #666; }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>🚗 Booking Confirmed!</h1>
+                        <h2>Thank you for choosing Infinite Mobile Carwash</h2>
+                    </div>
+                    
+                    <div class="content">
+                        <p>Dear {customer_name},</p>
+                        
+                        <p>Great news! Your car wash subscription has been successfully set up. We're excited to keep your vehicle looking its absolute best!</p>
+                        
+                        <div class="booking-details">
+                            <h3 style="margin-top: 0; color: #000;">📋 Your Booking Details</h3>
+                            
+                            <div class="detail-row">
+                                <span class="detail-label">🧽 Service:</span>
+                                <span class="detail-value">{plan_name}</span>
+                            </div>
+                            
+                            <div class="detail-row">
+                                <span class="detail-label">🚙 Vehicle Type:</span>
+                                <span class="detail-value">{vehicle_type.title()}</span>
+                            </div>
+                            
+                            <div class="detail-row">
+                                <span class="detail-label">📅 Frequency:</span>
+                                <span class="detail-value">{frequency.title()}</span>
+                            </div>
+                            
+                            <div class="detail-row">
+                                <span class="detail-label">💰 Amount:</span>
+                                <span class="detail-value">£{amount_pounds:.2f}/{frequency}</span>
+                            </div>
+                            
+                            <div class="detail-row">
+                                <span class="detail-label">📍 Service Address:</span>
+                                <span class="detail-value">{customer_address}</span>
+                            </div>
+                            
+                            <div class="detail-row">
+                                <span class="detail-label">📞 Contact Number:</span>
+                                <span class="detail-value">{customer_phone}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="highlight">
+                            <h3 style="margin: 0;">🎯 What Happens Next?</h3>
+                            <p style="margin: 10px 0;">Our team will contact you within 24 hours to schedule your first service appointment. We'll work around your schedule to find the perfect time!</p>
+                        </div>
+                        
+                        <div class="contact-info">
+                            <h3 style="margin-top: 0;">📞 Need to Contact Us?</h3>
+                            <p style="margin: 5px 0;"><strong>Phone:</strong> 07403 139086</p>
+                            <p style="margin: 5px 0;"><strong>Email:</strong> info@infinitemobilecarwashdetailing.co.uk</p>
+                            <p style="margin: 5px 0;"><strong>Website:</strong> infinitemobilecarwashdetailing.co.uk</p>
+                        </div>
+                        
+                        <p>Thank you for trusting us with your vehicle care needs. We look forward to providing you with exceptional service!</p>
+                        
+                        <p>Best regards,<br>
+                        <strong>The Infinite Mobile Carwash & Detailing Team</strong></p>
+                    </div>
+                    
+                    <div class="footer">
+                        <p>This email was sent to {customer_email}</p>
+                        <p>© 2025 Infinite Mobile Carwash & Detailing. All rights reserved.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """
+            
+            # Plain text version
+            text_content = f"""
+            Booking Confirmed - {plan_name} Service
+            
+            Dear {customer_name},
+            
+            Great news! Your car wash subscription has been successfully set up.
+            
+            Your Booking Details:
+            - Service: {plan_name}
+            - Vehicle Type: {vehicle_type.title()}
+            - Frequency: {frequency.title()}
+            - Amount: £{amount_pounds:.2f}/{frequency}
+            - Service Address: {customer_address}
+            - Contact Number: {customer_phone}
+            
+            What Happens Next?
+            Our team will contact you within 24 hours to schedule your first service appointment.
+            
+            Contact Us:
+            Phone: 07403 139086
+            Email: info@infinitemobilecarwashdetailing.co.uk
+            Website: infinitemobilecarwashdetailing.co.uk
+            
+            Thank you for choosing Infinite Mobile Carwash & Detailing!
+            
+            Best regards,
+            The Infinite Mobile Carwash & Detailing Team
+            """
+            
+            # Create the email message
+            message = Mail(
+                from_email=Email(self.from_email, "Infinite Mobile Carwash & Detailing"),
+                to_emails=To(customer_email),
+                subject=subject,
+                html_content=HtmlContent(html_content),
+                plain_text_content=PlainTextContent(text_content)
+            )
+            
+            # Send the email
+            response = self.sg.send(message)
+            
+            if response.status_code in [200, 201, 202]:
+                logger.info(f"Customer confirmation email sent successfully to {customer_email}")
+                return True
+            else:
+                logger.error(f"Failed to send customer confirmation email. Status code: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error sending customer confirmation email: {str(e)}")
+            return False
+
