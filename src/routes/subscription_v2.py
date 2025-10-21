@@ -61,24 +61,24 @@ def get_subscription_plans():
                 'created_at': '2025-10-01T00:00:00.000000',
                 'pricing_examples': {
                     'small_car': {
-                        'weekly': 47.6,
-                        'bi_weekly': 25.2,
-                        'monthly': 14.0
+                        'weekly': 119.0,
+                        'bi_weekly': 63.0,
+                        'monthly': 35.0
                     },
                     'medium_car': {
-                        'weekly': 68.0,
-                        'bi_weekly': 36.0,
-                        'monthly': 20.0
+                        'weekly': 170.0,
+                        'bi_weekly': 90.0,
+                        'monthly': 50.0
                     },
                     'large_car': {
-                        'weekly': 81.6,
-                        'bi_weekly': 43.2,
-                        'monthly': 24.0
+                        'weekly': 204.0,
+                        'bi_weekly': 108.0,
+                        'monthly': 60.0
                     },
                     'van': {
-                        'weekly': 102.0,
-                        'bi_weekly': 54.0,
-                        'monthly': 30.0
+                        'weekly': 255.0,
+                        'bi_weekly': 135.0,
+                        'monthly': 75.0
                     }
                 }
             },
