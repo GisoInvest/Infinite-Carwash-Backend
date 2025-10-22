@@ -229,13 +229,13 @@ def get_subscription_plans():
                     'Chrome and trim polishing'
                 ],
                 'vehicle_types': ['small_car', 'medium_car', 'large_car', 'van'],
-                'frequency_options': ['monthly'],
+                'frequency_options': ['yearly'],
                 'created_at': '2025-10-01T00:00:00.000000',
                 'pricing_examples': {
-                    'small_car': {'monthly': 450.0},
-                    'medium_car': {'monthly': 450.0},
-                    'large_car': {'monthly': 450.0},
-                    'van': {'monthly': 450.0}
+                    'small_car': {'yearly': 450.0},
+                    'medium_car': {'yearly': 450.0},
+                    'large_car': {'yearly': 450.0},
+                    'van': {'yearly': 450.0}
                 }
             },
             {
@@ -257,13 +257,13 @@ def get_subscription_plans():
                     'Paint depth enhancement'
                 ],
                 'vehicle_types': ['small_car', 'medium_car', 'large_car', 'van'],
-                'frequency_options': ['monthly'],
+                'frequency_options': ['yearly'],
                 'created_at': '2025-10-01T00:00:00.000000',
                 'pricing_examples': {
-                    'small_car': {'monthly': 650.0},
-                    'medium_car': {'monthly': 650.0},
-                    'large_car': {'monthly': 650.0},
-                    'van': {'monthly': 650.0}
+                    'small_car': {'yearly': 650.0},
+                    'medium_car': {'yearly': 650.0},
+                    'large_car': {'yearly': 650.0},
+                    'van': {'yearly': 650.0}
                 }
             }
         ]
